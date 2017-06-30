@@ -1,12 +1,11 @@
 
 
+# SAC SMA - hydrology simulation
 
-sac_sma <- function(S_Date, E_Date, Prcp, Tavg, Basin_Lat, Basin_Elev, Par, IniState, flag_snowmodule) {
+sac_sma <- function(S_Date, E_Date, Prcp, Tavg, Basin_Lat, Basin_Elev, Par, 
+                    IniState, flag_snowmodule) {
     
-  # SAC_SMA PARAMETERS ---------------------------------------------------------
-  
-  
-  #browser()
+  # PARAMETERIZATION -----------------------------------------------------------
   
   # Capacity Thresholds
   uztwm  <-  Par[1]    # Upper zone tension water capacity [mm]
@@ -48,15 +47,7 @@ sac_sma <- function(S_Date, E_Date, Prcp, Tavg, Basin_Lat, Basin_Elev, Par, IniS
   PLWHC  <-  Par[25]   # Percent liquid water holding capacity (maximum value allowed is 0.4)
   NMF    <-  Par[26]   # Maximum negative melt factor
   DAYGM  <-  Par[27]   # A constant daily rate of melt at the soil-snow interface
-  
   snowpar <- c(SCF, PXTEMP, MFMAX, MFMIN, UADJ, MBASE, TIPM, PLWHC, NMF, DAYGM)
-  
-
-  #Calculate PET based on Hamon Equation --------------------------------------
-  pet <- petHamon(doy = yday(sim_date), basin_lat = as.numeric(hru_lat), 
-    Tavg = Tavg, KPEC = coeff)
-
-  # EXECUTE MODEL FOR EVERY TIME STEP ------------------------------------------
   
   # Initial Storage States
   # SAC-SMA
@@ -73,6 +64,8 @@ sac_sma <- function(S_Date, E_Date, Prcp, Tavg, Basin_Lat, Basin_Elev, Par, IniS
   W_q     <- IniState[9]   # Liquid water held by the snow (mm)
   Deficit <- IniState[10]  # Heat Deficit, also known as NEGHS, Negative Heat Storage
   snow_state <- c(W_i, ATI, W_q, Deficit) 
+
+  # PREPARE RESERVOIR ARRAYS ---------------------------------------------------
   
   # RESERVOIR STATE ARRAY INITIALIZATION
   empty_vec <- vector(mode = "numeric", length = length(Prcp))
@@ -95,11 +88,15 @@ sac_sma <- function(S_Date, E_Date, Prcp, Tavg, Basin_Lat, Basin_Elev, Par, IniS
   surf_tot <- empty_vec  # Simulated Surface&Subsurface water flow
   SWE_tot  <- empty_vec  # Simulated Snow Water Equivalent (SWE)
   
+  #CALCULATE PET (HAMON EQUATION) ----------------------------------------------
+  pet <- petHamon(doy = yday(seq.Date(S_Date, E_Date, by = "day")), 
+                  basin_lat = as.numeric(Basin_Lat), Tavg = Tavg, KPEC = coeff)
+  
+  #PERFORM HYDROLOGY SIMULATION USING THE SAC-SMA ------------------------------   
   thres_zero  <- 0.00001      # Threshold to be considered as zero
   parea       <- 1 - adimp - pctim
-
-  #PERFORM HYDROLOGY SIMULATION USING THE SAC-SMA   
-  for (i in 1:sim_per) {
+  
+  for (i in 1:length(pet)) {
     
     # SNOW COMPONENT (IGNORE FOR NOW!!!!!!!!) ***********************
     
@@ -472,5 +469,5 @@ sac_sma <- function(S_Date, E_Date, Prcp, Tavg, Basin_Lat, Basin_Elev, Par, IniS
   
   return(simflow)
 
+  
 }
-

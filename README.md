@@ -3,7 +3,7 @@
 # Sacramento Soil Moisture Accounting Model in R (SAC-SMA)
 
 
-[! [SAC-SMA](http://www.appsolutelydigital.com/ModelPrimer/images/image79.jpeg)]
+[! [](http://www.appsolutelydigital.com/ModelPrimer/images/image79.jpeg)]
 
 ## Description
 

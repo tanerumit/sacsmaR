@@ -34,7 +34,6 @@ gridinfo <- read.table(paste0(hru_infodir, 'HRUinfo_arrhon.txt'))
 #Calibrated sac-sma parameters
 calib_par <- read.table(paste0(hru_infodir,'hru_optpar_0425_arrhon_KGE75.txt'))
 
-
 # SIMULATION ANALYSIS ----------------------------------------------------------
 
 results <- sac_sma_dsm(str_date     = as.Date("1995/10/1"), 

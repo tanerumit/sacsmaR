@@ -1,7 +1,9 @@
-[![](http://www.appsolutelydigital.com/ModelPrimer/images/image79.jpeg)]
 
 
-R wrapper for Sacramento Soil Moisture Accounting Model (SAC-SMA)
+# Sacramento Soil Moisture Accounting Model in R (SAC-SMA)
+
+
+[!(http://www.appsolutelydigital.com/ModelPrimer/images/image79.jpeg)]
 
 ## Description
 

@@ -1,6 +1,9 @@
 
 
-# SAC SMA - hydrology simulation
+# SAC SMA - hydrology simulation model
+
+### Inputs
+
 
 sac_sma <- function(S_Date, E_Date, Prcp, Tavg, Basin_Lat, Basin_Elev, Par, 
                     IniState, flag_snowmodule) {
@@ -469,5 +472,4 @@ sac_sma <- function(S_Date, E_Date, Prcp, Tavg, Basin_Lat, Basin_Elev, Par,
   
   return(simflow)
 
-  
 }

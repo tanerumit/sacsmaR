@@ -1,4 +1,5 @@
 
+
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Sacramento Soil Moisture Accounting (SAC-SMA) Model
 # 
@@ -33,6 +34,7 @@ gridinfo <- read.table(paste0(hru_infodir, 'HRUinfo_arrhon.txt'))
 
 #Calibrated sac-sma parameters
 calib_par <- read.table(paste0(hru_infodir,'hru_optpar_0425_arrhon_KGE75.txt'))
+
 
 # SIMULATION ANALYSIS ----------------------------------------------------------
 

@@ -83,28 +83,33 @@ sac_sma_dsm <- function(str_date, end_date, grid_lat, grid_lon, grid_area, grid_
       Basin_Elev = hru_elev, Par = hru_par, IniState = inistates, 
       flag_snowmodule = 0)
     
-    #hru_simflow <- hru_simflow * hru_area[n] / tot_area
+    hru_simflow <- hru_simflow * hru_area[n] / tot_area
    
     
     # CHANNEL ROUTING FROM LOHMANN MODEL ---------------------------------------
-    #pars_rout <- hru_par[28:length(hru_par)] # Routing model parameters
-    #UH_river  <- route_lohamann(pars = pars_rout, 
-    #   flowlen = hru_flowlen, KE = KE, UH_DAY = UH_DAY)
+    pars_rout <- hru_par[28:length(hru_par)] # Routing model parameters
+    UH_river  <- route_lohamann(pars = pars_rout, flowlen = hru_flowlen, KE = KE, UH_DAY = UH_DAY)
    
     
     # MAKE CONVOLUTION FOR BASIN OUTLET STREAMFLOW -----------------------------
     #Loop through each period
-    #for (i in 1:sim_per) {
-    #  #Loop through "base time periods"
-    #  for(j in 1:KE+UH_DAY-1) {
-    #    if(i-j+1 >= 1) {FLOW[i] <- FLOW[i] + UH_river[j] * hru_simflow[i-j+1]}
-    #  }
-    #}
-    
-    FLOW[,n] <-  hru_simflow
-  
+    for(i in 1:sim_per) {
+      #Loop through "base time periods"
+      for(j in 1:(KE+UH_DAY-1)) {
+        if((i-j+1) >= 1) {
+          FLOW[i,n] <- FLOW[i,n] + UH_river[j] * hru_simflow[i-j+1]
+        }
+      }
+    }
+
   } #close the loop for each hru
   
-  return(FLOW)
+  #Find flow at the outlet by summing flow over HRUs
+  TOTFLOW <- apply(FLOW, 1, sum)
+  
+  return(TOTFLOW)
 }
+
+#DF <- data.frame(x = 1:sim_per, y = FLOW[,1])
+#ggplot(DF, aes(x,y)) + geom_line()
   

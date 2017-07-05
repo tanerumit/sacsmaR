@@ -1,6 +1,6 @@
 
 
-# Sacramento Soil Moisture Accounting Model in R (SAC-SMA)
+# Sacramento Soil Moisture Accounting (SAC-SMA) Model
 
 ### _DO NOT USE - Currently under development_
 

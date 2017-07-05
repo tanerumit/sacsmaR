@@ -2,8 +2,9 @@
 
 # Sacramento Soil Moisture Accounting Model in R (SAC-SMA)
 
-
 [![](http://www.appsolutelydigital.com/ModelPrimer/images/image79.jpeg)
+
+** DO NOT USE - Currently under development **
 
 ## Description
 
@@ -25,7 +26,7 @@ ideal for large drainage basins and uses multiple years of records for calibrati
 The SAC-SMA model is a key model used by the U.S. National Weather Service River 
 Forecast System (NWSRFS) to issue river forecasts across the country. 
 
-The original model code is written in Fortran and is publicly accessible.
-The model code is also translated into [MATLAB](http:/hydrosystemsgroup.blog.umass.edu)
+## R Version
 
-## Highlights
+The original model code is written in Fortran and is publicly accessible. The R
+version of the model is translated from the Matlab code developed by Dr.Sungwook Wi.

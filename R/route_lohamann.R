@@ -81,6 +81,3 @@ route_lohamann <- function(pars, flowlen, KE, UH_DAY) {
   
   return(UH_R)
 }
-
-
-

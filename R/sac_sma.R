@@ -1,13 +1,10 @@
 
-
 # SAC SMA - hydrology simulation model
 
 ### Inputs
-
-
 sac_sma <- function(S_Date, E_Date, Prcp, Tavg, Basin_Lat, Basin_Elev, Par, 
-                    IniState, flag_snowmodule) {
-    
+                    IniState, flag_snowmodule = 0) {
+
   # PARAMETERIZATION -----------------------------------------------------------
   
   # Capacity Thresholds
@@ -52,8 +49,7 @@ sac_sma <- function(S_Date, E_Date, Prcp, Tavg, Basin_Lat, Basin_Elev, Par,
   DAYGM  <-  Par[27]   # A constant daily rate of melt at the soil-snow interface
   snowpar <- c(SCF, PXTEMP, MFMAX, MFMIN, UADJ, MBASE, TIPM, PLWHC, NMF, DAYGM)
   
-  # Initial Storage States
-  # SAC-SMA
+  # Initial Storage States (SAC-SMA)
   uztwc <- IniState[1]     # Upper zone tension water storage
   uzfwc <- IniState[2]     # Upper zone free water storage
   lztwc <- IniState[3]     # Lower zone tension water storage
@@ -105,9 +101,11 @@ sac_sma <- function(S_Date, E_Date, Prcp, Tavg, Basin_Lat, Basin_Elev, Par,
     
     # Precipitation adjusted by snow process (SNOW17)
     if(flag_snowmodule == 1) {
+      
       #SNOW17(snowpar,Prcp(i),Tavg(i),Basin_Elev,snow_state,juliandd(i,:))
       #SWE_tot(i) = SWE;
       #pr = meltNrain;
+      
     } else {
       pr = Prcp[i]
     }
@@ -391,7 +389,6 @@ sac_sma <- function(S_Date, E_Date, Prcp, Tavg, Basin_Lat, Basin_Elev, Par,
           
           ssur = ssur + (sur * parea)
           
-          
           # ADSUR is the amount of surface runoff which comes from
           # that portion of adimp which is not currently generating
           # direct runoff. ADDRO/PINC is the fraction of adimp
@@ -400,10 +397,7 @@ sac_sma <- function(S_Date, E_Date, Prcp, Tavg, Basin_Lat, Basin_Elev, Par,
           ssur = ssur + adsur * adimp
           
         }
-
       }  
-
-
     }
     
       adimc <- adimc + pinc - addro - adsur

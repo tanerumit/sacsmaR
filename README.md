@@ -22,6 +22,8 @@ Further information is available from [NOAA - National Weather Service](http://w
 
 ![alt text](http://www.appsolutelydigital.com/ModelPrimer/images/image79.jpeg "SAC-SMA m")
 
+[![](http://www.appsolutelydigital.com/ModelPrimer/images/image79.jpeg)
+
 ## R Version
 
 The original model code is written in Fortran and is publicly accessible. The R

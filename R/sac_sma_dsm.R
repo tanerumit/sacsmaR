@@ -1,18 +1,39 @@
 
-### Inputs to sac_sma_dsm() 
 
-# str_date      = starting date of the simulation, (YYYY/MM/DD)
-# end_date      = ending date of the simulation, (YYYY/MM/DD)
-# grid_lat      = latitude info for all HRUs, as character vector
-# grid_lon      = longitude info for all HRUs, as character vector
-# grid_area     = surface area of all HRUs (km2), as numeric vector  
-# grid_elev     = elevation info for all HRUs (m), as numeric vector
-# grid_flowlen  = flow length info for all HRUs (m),, as numeric vector
-# grid_par      = calibrated parameter set for al HRUs, 31 parameter values
-# flog_snow17   = flag to indicate if the snow component is active (0 or 1)
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Sacramento Soil Moisture Accounting (SAC-SMA) Model
+# 
+# The SAC-SMA is a conceptual model using a two-layer soil moisture system to
+# continuously account for storage and flow through the soil layers. 
+# 
+# The R version of the model is developed based on the MATLAB code (Sungwook Wi)
+
+# Latest update: 7/5/2017
+
+# Current progress: 
+#   main sac_sma module: DONE
+#   routing module: DONE
+#   snow module: not implemented
+
+# # Contact: M. Umit Taner (tanerumit@gmail.com)  
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
 
 sac_sma_dsm <- function(str_date, end_date, grid_lat, grid_lon, grid_area, grid_elev, 
                         grid_flowlen, grid_par, flag_SNOW17 = 0) {
+  
+  ### Inputs:
+  
+  # str_date      = starting date of the simulation, (YYYY/MM/DD)
+  # end_date      = ending date of the simulation, (YYYY/MM/DD)
+  # grid_lat      = latitude info for all HRUs, as character vector
+  # grid_lon      = longitude info for all HRUs, as character vector
+  # grid_area     = surface area of all HRUs (km2), as numeric vector  
+  # grid_elev     = elevation info for all HRUs (m), as numeric vector
+  # grid_flowlen  = flow length info for all HRUs (m),, as numeric vector
+  # grid_par      = calibrated parameter set for al HRUs, 31 parameter values
+  # flog_snow17   = flag to indicate if the snow component is active (0 or 1)
   
   #Essential R-packages needed
   require(tidyr)
@@ -48,9 +69,6 @@ sac_sma_dsm <- function(str_date, end_date, grid_lat, grid_lon, grid_area, grid_
   sim_per  <- length(sim_date)      # Simulation period
   num_hru  <- nrow(gridinfo)        # Total number of HRUs
   tot_area <- sum(grid_area)        # Total watershed area
-
-  #EMPTY ARRAYS FOR THE OUTPUTS 
-  FLOW <- matrix(0, nrow = sim_per, ncol = num_hru) #Simulated flow for each hru
   
   #Run through each HRU, simulate streamflow 
   for (n in 1:num_hru) {
@@ -83,13 +101,15 @@ sac_sma_dsm <- function(str_date, end_date, grid_lat, grid_lon, grid_area, grid_
       Basin_Elev = hru_elev, Par = hru_par, IniState = inistates, 
       flag_snowmodule = 0)
     
-    hru_simflow <- hru_simflow * hru_area[n] / tot_area
+    hru_simflow <- hru_simflow * hru_area / tot_area
    
     # CHANNEL ROUTING FROM LOHMANN MODEL ---------------------------------------
     pars_rout <- hru_par[28:length(hru_par)] # Routing model parameters
     UH_river  <- route_lohamann(pars = pars_rout, flowlen = hru_flowlen, KE = KE, UH_DAY = UH_DAY)
    
     # MAKE CONVOLUTION FOR BASIN OUTLET STREAMFLOW -----------------------------
+    FLOW <- matrix(0, nrow = sim_per, ncol = num_hru) #Simulated flow for each hru
+
     #Loop through each period
     for(i in 1:sim_per) {
       #Loop through "base time periods"

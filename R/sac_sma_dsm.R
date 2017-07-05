@@ -85,12 +85,10 @@ sac_sma_dsm <- function(str_date, end_date, grid_lat, grid_lon, grid_area, grid_
     
     hru_simflow <- hru_simflow * hru_area[n] / tot_area
    
-    
     # CHANNEL ROUTING FROM LOHMANN MODEL ---------------------------------------
     pars_rout <- hru_par[28:length(hru_par)] # Routing model parameters
     UH_river  <- route_lohamann(pars = pars_rout, flowlen = hru_flowlen, KE = KE, UH_DAY = UH_DAY)
    
-    
     # MAKE CONVOLUTION FOR BASIN OUTLET STREAMFLOW -----------------------------
     #Loop through each period
     for(i in 1:sim_per) {

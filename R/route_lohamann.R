@@ -14,12 +14,12 @@ route_lohamann <- function(pars, flowlen, KE, UH_DAY) {
   LE		<- 48*50
   
   # Green's function calculation to solve the linearized Saint-Venant
-  UH_DAILY <- matrix(0, nrow = 1, ncol = UH_DAY)
+  UH_DAILY <- vector(mode = "numeric", length = UH_DAY)
   if (flowlen == 0) {
     UH_DAILY[1] <- 1 
   } else {
     t <- 0 
-    uhm_grid <- matrix(0, nrow = 1, ncol = LE)
+    uhm_grid <- vector(mode = "numeric",length = LE)
     for(k in 1:LE) {
       t <- t + DT 
       pot <- ((VELO*t-flowlen)^2)/(4*DIFF*t)
@@ -30,6 +30,7 @@ route_lohamann <- function(pars, flowlen, KE, UH_DAY) {
       }
       uhm_grid[k] <- H 
     }
+    
     if(sum(uhm_grid) == 0) {
       uhm_grid[1] <-  1.0 
     } else {
@@ -37,20 +38,23 @@ route_lohamann <- function(pars, flowlen, KE, UH_DAY) {
     }
     UHM <- uhm_grid 
       
-      # Derive Daily River Impulse Response Function(Green's function)
-      FR <- matrix(data = 0, nrow = TMAX, ncol = 2)
-      FR[1:24,1] <- 1/24   
-      for(t in 1:TMAX) {
-        for(L in 1:TMAX+24) {
-          if(t-L > 0) {
-            FR[t,2] <- FR[t,2] + FR[t-L,1] * UHM[L]  
-          }
+    # Derive Daily River Impulse Response Function(Green's function)
+    FR <- matrix(data = 0, nrow = TMAX, ncol = 2)
+    FR[1:24,1] <- 1/24   
+    
+    # Nested for loop - Too-slow!
+    for(t in 1:TMAX) {
+      for(L in 1:(TMAX+24)) {
+        if((t-L) > 0) {
+          FR[t,2] <- FR[t,2] + FR[t-L,1] * UHM[L]  
         }
-    }
-      for(t in 1:UH_DAY) {
-        UH_DAILY[t] <- sum(FR[24*t-23:24*t,2]) 
       }
     }
+    
+    for(t in 1:UH_DAY) {
+      UH_DAILY[t] <- sum(FR[(24*t-23):(24*t),2]) 
+    }
+  }
   
   # HRU's Unit Hydrograph represented by Gamma distribution function
   # Matlab code:  @(x) gampdf(x,NumRes,1/K) #(x: values, A = shape parameters, B = scale parameters)
@@ -58,16 +62,15 @@ route_lohamann <- function(pars, flowlen, KE, UH_DAY) {
           return(dgamma(x, shape = NumRes, scale = 1/K))
   }
 
-  UH_HRU <- matrix(0, nrow = 12, ncol = 1)
+  UH_HRU <- vector(mode = "numeric", length = 12)
   for(i in 1:KE) {
     #integration in matlab: integral(fun,xmin,xmax)
     #integration in R: integrate(f, lower, upper, ...)
-    pinteg <- integrate(hruh_fun, 24*(i-1), 24*i)$value 
-    UH_HRU[i] <- pinteg 
+    UH_HRU[i] <- integrate(hruh_fun, 24*(i-1), 24*i)$value 
   }
   
   # River UH
-  UH_R <- matrix(0, nrow = 1, ncol = KE+UH_DAY-1)
+  UH_R <- vector(mode = "numeric", length = KE+UH_DAY-1)
   for(k in 1:KE) {
     for(u in 1:UH_DAY) {
       UH_R[k+u-1] <- UH_R[k+u-1] + UH_HRU[k] * UH_DAILY[u] 

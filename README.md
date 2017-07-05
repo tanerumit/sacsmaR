@@ -18,11 +18,9 @@ to estimate the amount of water that enters, is stored in, and leaves the basin.
 Thus, the model estimates several key hydrologic processes including evapotranspiration, 
 percolation, interflow, and different forms of runoff from a basin. 
 
-Further information is available from [NOAA - National Weather Service](http://www.nws.noaa.gov/oh/hrl/nwsrfs/users_manual/part2/_pdf/23sacsma.pdf)
+Further information is available at: [NOAA - National Weather Service](http://www.nws.noaa.gov/oh/hrl/nwsrfs/users_manual/part2/_pdf/23sacsma.pdf)
 
-![alt text](http://www.appsolutelydigital.com/ModelPrimer/images/image79.jpeg "SAC-SMA m")
-
-[![](http://www.appsolutelydigital.com/ModelPrimer/images/image79.jpeg)
+![alt text](http://www.appsolutelydigital.com/ModelPrimer/images/image79.jpeg "SAC-SMA model")
 
 ## R Version
 

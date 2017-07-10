@@ -1,5 +1,5 @@
 
-
+### ORIGINAL +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 petHamon <- function(doy, basin_lat, Tavg, Ld, KPEC) {
   
@@ -18,3 +18,25 @@ petHamon <- function(doy, basin_lat, Tavg, Ld, KPEC) {
   return(as.numeric(unlist(pet)))
 
 }
+
+
+### MATLAB BASED EQUATION ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+petHamon2 <- function(doy, coeff, basin_lat, Tavg) {
+  
+  var_theta   <- 0.2163108 + 2*atan(0.9671396 * tan(0.0086 * (doy-186))) 
+  var_pi      <- asin(0.39795 * cos(var_theta)) 
+  daylighthr  = 24-24/pi * acos((sin(0.8333*pi/180) + sin(basin_lat*pi/180) * sin(var_pi))/(cos(basin_lat*pi/180)*cos(var_pi))) 
+  
+  esat <- 0.611 * exp(17.27 * Tavg/(237.3 + Tavg))
+  pet  <- coeff * 29.8 * daylighthr*(esat/(Tavg + 273.2))
+  return(pet)
+}
+  
+  
+  
+
+
+
+
+

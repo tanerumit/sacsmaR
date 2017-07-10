@@ -24,11 +24,30 @@ calib_par <- read.table(paste0(hru_infodir,'hru_optpar_0425_arrhon_KGE75.txt'))
 
 # SIMULATION ANALYSIS ----------------------------------------------------------
 
+str_date = as.Date("1995/10/1")
+end_date = as.Date("2014/09/30")
+grid_lat = gridinfo[[1]]
+grid_lon = gridinfo[[2]]
+grid_area = gridinfo[[3]]
+grid_elev = gridinfo[[4]]
+grid_flowlen = gridinfo[[5]]
+grid_par  = calib_par
+flag_SNOW17 = 0
+
+#profvis({
+  
 results <- sac_sma_dsm(str_date = as.Date("1995/10/1"), 
-                       end_date = as.Date("2014/09/30"), 
-                       grid_lat = gridinfo[[1]], 
-                       grid_lon = gridinfo[[2]],
-                       grid_area = gridinfo[[3]],
-                       grid_elev = gridinfo[[4]],
-                       grid_flowlen = gridinfo[[5]],
-                       grid_par  = calib_par)
+                         end_date = as.Date("2014/09/30"), 
+                         grid_lat = gridinfo[[1]], 
+                         grid_lon = gridinfo[[2]],
+                         grid_area = gridinfo[[3]],
+                         grid_elev = gridinfo[[4]],
+                         grid_flowlen = gridinfo[[5]],
+                         grid_par  = calib_par)
+  
+#})
+
+
+write.csv(results, "./Data/r_hru_all_nosnow.csv")
+write.csv(results, "./Data/r_routing_hrus.csv")
+#write.csv(results, "./Data/r_totflow_nosnow.csv")

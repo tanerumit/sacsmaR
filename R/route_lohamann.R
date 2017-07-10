@@ -41,7 +41,12 @@ route_lohamann <- function(pars, flowlen, KE, UH_DAY) {
     # Derive Daily River Impulse Response Function(Green's function)
     FR <- matrix(data = 0, nrow = TMAX, ncol = 2) 
     FR[1:24,1] <- 1/24   
+
     
+    
+    
+    
+        
     #Create the master table for all t * L combinations
     start_time <- Sys.time() 
     loop_tL <- expand.grid(t = 1:TMAX, L = 1:(TMAX+24)) %>%
@@ -51,7 +56,7 @@ route_lohamann <- function(pars, flowlen, KE, UH_DAY) {
       arrange(t, L) %>%
       mutate(x = cumsum(FR[t-L,1] * UHM[L])) %>%
       slice(n())
-    
+ 
     FR[,2] <- c(FR[1,2],loop_tL$x)
     Sys.time() - start_time
 

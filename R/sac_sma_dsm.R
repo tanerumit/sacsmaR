@@ -18,8 +18,6 @@
 # # Contact: M. Umit Taner (tanerumit@gmail.com)  
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
-
 sac_sma_dsm <- function(str_date, end_date, grid_lat, grid_lon, grid_area, grid_elev, 
                         grid_flowlen, grid_par, flag_SNOW17 = 0) {
   
@@ -70,7 +68,10 @@ sac_sma_dsm <- function(str_date, end_date, grid_lat, grid_lon, grid_area, grid_
   num_hru  <- nrow(gridinfo)        # Total number of HRUs
   tot_area <- sum(grid_area)        # Total watershed area
   
+  #TOTFLOW <- matrix(0, nrow = sim_per, ncol = num_hru)
+  
   #Run through each HRU, simulate streamflow 
+  FLOW <- vector(mode = "numeric", length = sim_per) 
   for (n in 1:num_hru) {
   
     # Read-in data for current HRU
@@ -102,32 +103,25 @@ sac_sma_dsm <- function(str_date, end_date, grid_lat, grid_lon, grid_area, grid_
       flag_snowmodule = 0)
     
     hru_simflow <- hru_simflow * hru_area / tot_area
-   
-    # CHANNEL ROUTING FROM LOHMANN MODEL ---------------------------------------
-    pars_rout <- hru_par[28:length(hru_par)] # Routing model parameters
-    UH_river  <- route_lohamann(pars = pars_rout, flowlen = hru_flowlen, KE = KE, UH_DAY = UH_DAY)
-   
-    # MAKE CONVOLUTION FOR BASIN OUTLET STREAMFLOW -----------------------------
-    FLOW <- matrix(0, nrow = sim_per, ncol = num_hru) #Simulated flow for each hru
 
-    #Loop through each period
+    # # CHANNEL ROUTING FROM LOHMANN MODEL ---------------------------------------
+     pars_rout <- hru_par[28:length(hru_par)] # Routing model parameters
+     UH_river  <- route_lohamann(pars = pars_rout, flowlen = hru_flowlen, KE = KE, UH_DAY = UH_DAY)
+
+    # MAKE CONVOLUTION FOR BASIN OUTLET STREAMFLOW -----------------------------
     for(i in 1:sim_per) {
+
       #Loop through "base time periods"
       for(j in 1:(KE+UH_DAY-1)) {
         if((i-j+1) >= 1) {
-          FLOW[i,n] <- FLOW[i,n] + UH_river[j] * hru_simflow[i-j+1]
+          FLOW[i] <- FLOW[i] + UH_river[j] * hru_simflow[i-j+1]
         }
       }
     }
-
+    
   } #close the loop for each hru
   
-  #Find flow at the outlet by summing flow over HRUs
-  TOTFLOW <- apply(FLOW, 1, sum)
-  
-  return(TOTFLOW)
+  return(FLOW)
 }
 
-#DF <- data.frame(x = 1:sim_per, y = FLOW[,1])
-#ggplot(DF, aes(x,y)) + geom_line()
-  
+

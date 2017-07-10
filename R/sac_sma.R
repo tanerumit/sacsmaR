@@ -88,23 +88,38 @@ sac_sma <- function(S_Date, E_Date, Prcp, Tavg, Basin_Lat, Basin_Elev, Par,
   SWE_tot  <- empty_vec  # Simulated Snow Water Equivalent (SWE)
   
   #CALCULATE PET (HAMON EQUATION) ----------------------------------------------
-  pet <- petHamon(doy = yday(seq.Date(S_Date, E_Date, by = "day")), 
-                  basin_lat = as.numeric(Basin_Lat), Tavg = Tavg, KPEC = coeff)
+  #Matlab equivalent
+  pet <- petHamon2(doy = yday(seq.Date(S_Date, E_Date, by = "day")), 
+                   coeff = coeff, basin_lat = as.numeric(Basin_Lat), Tavg = Tavg)    
+  #pet <- petHamon(doy = yday(seq.Date(S_Date, E_Date, by = "day")), 
+  #                basin_lat = as.numeric(Basin_Lat), Tavg = Tavg, KPEC = coeff)
   
   #PERFORM HYDROLOGY SIMULATION USING THE SAC-SMA ------------------------------   
   thres_zero  <- 0.00001      # Threshold to be considered as zero
   parea       <- 1 - adimp - pctim
   
+  
+  #### FIND JULIAN DAY??? 
+  #jdate_mat = nan(e_datenum-s_datenum+1,1);
+  #datemat   =  datevec(s_datenum : e_datenum);
+  #juliandd  =  [datemat(:,1:3) jdate_mat];  % Snow17 input [yr mon day juliandate]
+  
+  
   for (i in 1:length(pet)) {
     
     # SNOW COMPONENT (IGNORE FOR NOW!!!!!!!!) ***********************
-    
     # Precipitation adjusted by snow process (SNOW17)
     if(flag_snowmodule == 1) {
       
-      #SNOW17(snowpar,Prcp(i),Tavg(i),Basin_Elev,snow_state,juliandd(i,:))
-      #SWE_tot(i) = SWE;
-      #pr = meltNrain;
+    #  snow_outputs <- SNOW17(pars = snowpar, prcp = Prcp[i], temp = Tavg[i], 
+    #    elev = Basin_Elev, states_input = snow_state, TIME = juliandd(i,:))
+      
+      SWE <- snow_outputs$SWE
+      meltNrain  <- snow_outputs$meltNrain
+      snow_state <- snow_outputs$snow_state
+      
+      SWE_tot[i] <- SWE
+      pr <- meltNrain
       
     } else {
       pr = Prcp[i]

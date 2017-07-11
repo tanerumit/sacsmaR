@@ -1,29 +1,21 @@
 
 #SNOW MODULE 
-
 snow17 <- function(pars, prcp, temp, elev, states_input, TIME) {
-  
-  W_i     <- states_input[1]    
-  ATI     <- states_input[2] 
-  W_q     <- states_input[3]    
-  Deficit <- states_input[4] 
-  
-  SCF    <- pars[1]  
-  PXTEMP <- pars[2]  
-  MFMAX  <- pars[3]  
-  MFMIN  <- pars[4] 
-  UADJ   <- pars[5]  
-  MBASE  <- pars[6]  
-  TIPM   <- pars[7]  
-  PLWHC  <- pars[8] 
-  NMF    <- pars[9]  
-  DAYGM  <- pars[10] 
+
+  #State parameters  
+  W_i     <- states_input[1]; ATI <- states_input[2] 
+  W_q     <- states_input[3]; Deficit <- states_input[4] 
+
+  #Other parameters
+  SCF    <- pars[1]; PXTEMP <- pars[2]; MFMAX <- pars[3]; MFMIN <- pars[4] 
+  UADJ   <- pars[5]; MBASE  <- pars[6]; TIPM  <- pars[7]; PLWHC  <- pars[8] 
+  NMF    <- pars[9]; DAYGM  <- pars[10] 
   
   dtt <- 24  # time interval of temperature data
   dtp <- 24  # time interval of prcipitation data
   
-  Ta <- temp      # Air temperature at this time step [deg C]
-  Pr <- prcp      # Precipitation at this time step [mm]
+  Ta <- temp  # Air temperature at this time step [deg C]
+  Pr <- prcp  # Precipitation at this time step [mm]
   
   # FORM OF PRECIPITATION
   if (Ta <= PXTEMP) {
@@ -37,34 +29,25 @@ snow17 <- function(pars, prcp, temp, elev, states_input, TIME) {
   }              
   
   # ACCUMULATION OF THE SNOW COVER
-  Pn  <- SNOW*SCF    # Water equivalent of new snowfall [mm]
+  Pn  <- SNOW * SCF  # Water equivalent of new snowfall [mm]
   W_i <- W_i + Pn    # Water equivalent of the ice portion of the snow cover [mm]
   E   <- 0           # Excess liquid water in the snow cover
   
   
   # ENERGY EXCHANGE AT SNOW/AIR SURFACE DURING NON-MELT PERIODS
   
-  # Seasonal variation in the non-rain melt factor
-  DAYN <- TIME[4]        # Current julian date
-  if(leapyear(TIME[1])) {
-    days<-366 
-    N_Mar21<-DAYN-81    # Day of year since March 21 [leap]  
-  }
-  else {
-    days <- 365 
-    N_Mar21<-DAYN-80 
-  }   
+  # Seasonal variation in the non-rain melt factor 
+  DAYN <- TIME[2]  
+  end_doy <- yday(as.Date(paste0(year(test),"/12/31"))) - 365
+  N_Mar21 <- DAYN - (80 + end_doy)
+
   
   Sv <- (0.5*sin((N_Mar21 * 2 * pi)/days)) + 0.5        # Seasonal variation
   Av <- 1.0                                             # Seasonal variation adjustment, Av<-1.0 when lat < 54N
   Mf <- dtt/6 * ((Sv * Av * (MFMAX - MFMIN)) + MFMIN)   # Seasonally varying non-rain melt factor
   
   # New snow temperature and heat deficit from new snow
-  if(Ta < 0) {
-    T_snow_new <- Ta 
-  } else {
-    T_snow_new <- 0 
-  }
+  if(Ta < 0) T_snow_new <- Ta else T_snow_new <- 0 
 
   # Change in the heat deficit due to new snowfall [mm], 80 cal/g: 
   #latent heat of fusion, 0.5 cal/g/C: specific heat of ice
@@ -181,4 +164,5 @@ snow17 <- function(pars, prcp, temp, elev, states_input, TIME) {
   meltNrain <- E 
   states_input_update <- c(W_i ,ATI ,W_q ,Deficit)
   
+  return(list(SWE, meltNrain, states_input_update))
 }

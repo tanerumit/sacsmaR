@@ -2,8 +2,8 @@
 # SAC SMA - hydrology simulation model
 
 ### Inputs
-sac_sma <- function(S_Date, E_Date, Prcp, Tavg, Basin_Lat, Basin_Elev, Par, 
-                    IniState, flag_snowmodule = 0) {
+sac_sma <- function(Prcp, Tavg, Basin_Lat, Basin_Elev, Par, 
+                    IniState, flag_snowmodule = 0, ...) {
 
   # PARAMETERIZATION -----------------------------------------------------------
   
@@ -88,9 +88,7 @@ sac_sma <- function(S_Date, E_Date, Prcp, Tavg, Basin_Lat, Basin_Elev, Par,
   SWE_tot  <- empty_vec  # Simulated Snow Water Equivalent (SWE)
   
   #CALCULATE PET (HAMON EQUATION) ----------------------------------------------
-  sim_date_mat <- data_frame(Date = seq.Date(S_Date, E_Date, by = "day"), doy = yday(sim_date))
-  pet <- petHamon2(doy=sim_date_mat$doy, 
-    coeff = coeff, basin_lat = as.numeric(Basin_Lat), Tavg=Tavg)    
+  pet <- petHamon2(coeff = coeff, basin_lat = as.numeric(Basin_Lat), Tavg=Tavg, ...)    
 
   #PERFORM HYDROLOGY SIMULATION USING THE SAC-SMA ------------------------------   
   thres_zero  <- 0.00001      # Threshold to be considered as zero

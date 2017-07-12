@@ -1,7 +1,7 @@
 
 ## Routing Model developed by D. Lohmann
 
-route_lohamann <- function(pars, flowlen, KE, UH_DAY) {
+route_lohamann <- function(pars, flowlen) {
   
   # Routing model parameters
   NumRes <- pars[1]       # Grid Unit Hydrograph parameter (number of linear reservoirs)
@@ -37,49 +37,16 @@ route_lohamann <- function(pars, flowlen, KE, UH_DAY) {
       uhm_grid <- uhm_grid/sum(uhm_grid)  
     }
     UHM <- uhm_grid 
-      
+
     # Derive Daily River Impulse Response Function(Green's function)
     FR <- matrix(data = 0, nrow = TMAX, ncol = 2) 
     FR[1:24,1] <- 1/24   
-
     
-    
-    
-    
-        
-    #Create the master table for all t * L combinations
-    start_time <- Sys.time() 
-    loop_tL <- expand.grid(t = 1:TMAX, L = 1:(TMAX+24)) %>%
-      as_data_frame() %>%
-      filter(t-L > 0) %>%
-      group_by(t) %>%
-      arrange(t, L) %>%
-      mutate(x = cumsum(FR[t-L,1] * UHM[L])) %>%
-      slice(n())
- 
-    FR[,2] <- c(FR[1,2],loop_tL$x)
-    Sys.time() - start_time
-
+    for(t in 1:TMAX) {
+        L <- 1:(TMAX+24); L <- L[t-L > 0]
+        FR[t,2] <- FR[t,2] + sum(FR[t - L,1] * UHM[L])  
+    }
     UH_DAILY <- sapply(1:UH_DAY, function(t) sum(FR[(24*t-23):(24*t),2]))
-
-    # Nested for loop - Too-slow!
-    # Derive Daily River Impulse Response Function(Green's function)
-    #FR <- matrix(data = 0, nrow = TMAX, ncol = 2) 
-    #FR[1:24,1] <- 1/24   
-    #
-    #start_time <- Sys.time()
-    #for(t in 1:TMAX) {
-    #  for(L in 1:(TMAX+24)) {
-    #    if((t-L) > 0) {
-    #      FR[t,2] <- FR[t,2] + FR[t-L,1] * UHM[L]  
-    #    }
-    #  }
-    #}
-    
-    #for(t in 1:UH_DAY) {
-    #  UH_DAILY[t] <- sum(FR[(24*t-23):(24*t),2]) 
-    #}
-  
   }
   
   # HRU's Unit Hydrograph represented by Gamma distribution function

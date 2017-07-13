@@ -52,8 +52,6 @@ results <- sac_sma_dsm(str_date = as.Date("1995/10/1"),
 Rprof(NULL)
 summaryRprof("profile.out")
 
-
-
 write.csv(results, "./Data/r_hru_all_nosnow.csv")
 write.csv(results, "./Data/r_routing_hrus.csv")
 #write.csv(results, "./Data/r_totflow_nosnow.csv")

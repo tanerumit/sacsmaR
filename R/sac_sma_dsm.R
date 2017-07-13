@@ -40,9 +40,7 @@
 #griddata_list <- lapply(1:num_hru, function(x) read.table(hru_names[x])) %>%
 #  bind_rows(.id = "hru") %>% as_data_frame() %>%
 #  write_csv(., path = "gridclim.csv")
-
-
-sac_sma_dsm <- function(str_date, end_date, grid_lat, grid_lon, grid_area, grid_elev, 
+sac_sma_dsm <- compiler::cmpfun(function(str_date, end_date, grid_lat, grid_lon, grid_area, grid_elev, 
                         grid_flowlen, grid_par, flag_SNOW17 = 0) {
   
   #Essential R-packages needed
@@ -77,48 +75,40 @@ sac_sma_dsm <- function(str_date, end_date, grid_lat, grid_lon, grid_area, grid_
   # Run Distributed System Modeling version of SAC_SMA for each HRU
   sim_date <- seq.Date(str_date, end_date, by = "day") 
   sim_doy  <- yday(sim_date)
-  sim_per  <- length(sim_date)      # Simulation period
+  sim_per  <- length(sim_date) # Simulation period
   
-  num_hru  <- nrow(gridinfo)        # Total number of HRUs
-  tot_area <- sum(grid_area)        # Total watershed area
+  num_hru  <- nrow(grid_info)  # Total number of HRUs
+  tot_area <- sum(grid_area)   # Total watershed area
   
-  #Lat-long information
-  hru_lat  <- sapply(1:num_hru, function(n)
-    formatC(grid_lat[n], format = 'f', flag='0', digits = 4))
-  hru_lon  <- sapply(1:num_hru, function(n)
-    formatC(grid_lon[n], format = 'f', flag='0', digits = 4))
-  hru_names <-  paste0(hru_filedir,hru_lat, "_", hru_lon)
-  
-  griddata_list <- read_csv("gridclim.csv")
-
   #Run through each HRU, simulate streamflow 
   FLOW <- vector(mode = "numeric", length = sim_per) 
   for (n in 1:num_hru) {
   
     # Read-in data for current HRU
-    griddata  <- dplyr::filter(griddata_list, hru == n) %>% select(-hru)
-    
+    hru_data  <- grid_data[[n]]
+
     # Find starting and ending indices based on the specified dates
     if (n == 1) {
-      grid_date <- as.Date(paste(griddata[[1]], griddata[[2]], griddata[[3]], sep ="/"))
+      grid_date <- as.Date(paste(hru_data[[1]], hru_data[[2]], hru_data[[3]], sep ="/"))
       grid_ind  <- which(str_date == grid_date):which(end_date == grid_date) 
     }
     
-    griddata <- as.matrix(griddata)
+    hru_data <- as.matrix(hru_data)
     
     # FLOW SIMULATION USING SAC-SMA MODEL  
-    hru_prcp    <- griddata[grid_ind,4]
-    hru_temp    <- griddata[grid_ind,5] 
+    hru_prcp    <- hru_data[grid_ind,4]
+    hru_temp    <- hru_data[grid_ind,5] 
 
     hru_simflow <- sac_sma(Prcp = hru_prcp, Tavg = hru_temp, 
-      Basin_Lat = as.numeric(hru_lat[n]), Basin_Elev = grid_elev[n], 
+      Basin_Lat = grid_lat[n], Basin_Elev = grid_elev[n], 
       Par = as.numeric(grid_par[n,]), IniState = inistates, doy = sim_doy)
     
     hru_simflow <- hru_simflow * grid_area[n] / tot_area
 
     # # CHANNEL ROUTING FROM LOHMANN MODEL  
     pars_rout <- as.numeric(grid_par[n,28:31])     
-    UH_river  <- route_lohamann(pars = pars_rout, flowlen = grid_flowlen[n])
+    UH_river  <- route_lohamann(pars = pars_rout, flowlen = grid_flowlen[n], UH_DAY, KE)
+
 
     # CONVOLUTION (Vectorized form)  
     for(i in 1:sim_per) {
@@ -130,6 +120,4 @@ sac_sma_dsm <- function(str_date, end_date, grid_lat, grid_lon, grid_area, grid_
   
   return(FLOW)
   
-}
-
-
+})

@@ -2,8 +2,6 @@
 
 # Sacramento Soil Moisture Accounting (SAC-SMA) Model
 
-### _DO NOT USE - Currently under development_
-
 
 ## Model Description
 
@@ -25,5 +23,8 @@ Further information is available at: [NOAA - National Weather Service](http://ww
 ## R Version
 
 The original model code is written in Fortran and is publicly accessible. The R
-version of the model is translated from the Matlab code developed by [Sungwook Wi](https://github.com/sungwookwi)
+version of the model is translated from the MATLAB code developed by [Sungwook Wi](https://github.com/sungwookwi)
 
+## Current progress
+
+The model is currently under development.

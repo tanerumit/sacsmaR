@@ -25,4 +25,5 @@ Further information is available at: [NOAA - National Weather Service](http://ww
 ## R Version
 
 The original model code is written in Fortran and is publicly accessible. The R
-version of the model is translated from the Matlab code developed by Dr. Sungwook Wi.
+version of the model is translated from the Matlab code developed by [Sungwook Wi](https://github.com/sungwookwi)
+

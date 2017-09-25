@@ -26,7 +26,8 @@ for (n in 1:num_hru) {
 }
 
 #Calibrated sac-sma parameters
-calib_par <- read.table(paste0(main_filedir,'/HRUfiles/hru_optpar_0425_arrhon_KGE75.txt'))
+calib_par <- read.table(
+  paste0(main_filedir,'/HRUfiles/hru_optpar_0425_arrhon_KGE75.txt'))
 
 # SIMULATION ANALYSIS ----------------------------------------------------------
 
@@ -54,4 +55,3 @@ summaryRprof("profile.out")
 
 write.csv(results, "./Data/r_hru_all_nosnow.csv")
 write.csv(results, "./Data/r_routing_hrus.csv")
-#write.csv(results, "./Data/r_totflow_nosnow.csv")

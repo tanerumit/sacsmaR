@@ -1,6 +1,6 @@
 
 ## Routing Model developed by D. Lohmann
-route_lohamann <- compiler::cmpfun(function(pars, flowlen, UH_DAY, KE) {
+route_lohamann <- compiler::cmpfun(function(pars, flowlen, UH_DAY = 96, KE  = 12) {
   
   # Routing model parameters
   NumRes <- pars[1]       # Grid Unit Hydrograph parameter (number of linear reservoirs)

@@ -1,11 +1,14 @@
 
+
+
+
 # SAC SMA - hydrology simulation model
 
 ### Inputs
 sac_sma <- function(Prcp, Tavg, Basin_Lat, Basin_Elev, Par, 
-                    IniState, flag_snowmodule = 0, ...) {
+                    IniState, flag_snowmodule = 1, ...) {
 
-  # PARAMETERIZATION -----------------------------------------------------------
+  # PARAMETERIZATION ----------------------------------------------------------#
   
   # Capacity Thresholds
   uztwm  <-  Par[1]    # Upper zone tension water capacity [mm]
@@ -64,21 +67,22 @@ sac_sma <- function(Prcp, Tavg, Basin_Lat, Basin_Elev, Par,
   Deficit <- IniState[10]  # Heat Deficit, also known as NEGHS, Negative Heat Storage
   snow_state <- c(W_i, ATI, W_q, Deficit) 
 
-  # PREPARE RESERVOIR ARRAYS ---------------------------------------------------
+  # PREPARE RESERVOIR ARRAYS --------------------------------------------------#
   
   # RESERVOIR STATE ARRAY INITIALIZATION
   empty_vec <- vector(mode = "numeric", length = length(Prcp))
+  
   # Upper zone states
   uztwc_tot <- empty_vec  # State of Upper zone tension water storage [mm]
-  uzfwc_tot <- empty_vec   # State of Upper zone free water storage [mm]
+  uzfwc_tot <- empty_vec  # State of Upper zone free water storage [mm]
   
   # Lower zone states
-  lztwc_tot <- empty_vec   # State of Lower zone tension water storage [mm]
-  lzfsc_tot <- empty_vec   # State of Lower zone free water supplementary storage [mm]
-  lzfpc_tot <- empty_vec   # State of Lower zone free water primary storage [mm]
+  lztwc_tot <- empty_vec  # State of Lower zone tension water storage [mm]
+  lzfsc_tot <- empty_vec  # State of Lower zone free water supplementary storage [mm]
+  lzfpc_tot <- empty_vec  # State of Lower zone free water primary storage [mm]
   
   # Additional impervious zone states
-  adimc_tot <- empty_vec   # State of additional impervious area storages [mm]
+  adimc_tot <- empty_vec  # State of additional impervious area storages [mm]
   
   # MODEL OUPUT ARRAY INITIALIZATION
   simflow  <- empty_vec  # Simulated Streamflow
@@ -87,22 +91,21 @@ sac_sma <- function(Prcp, Tavg, Basin_Lat, Basin_Elev, Par,
   surf_tot <- empty_vec  # Simulated Surface&Subsurface water flow
   SWE_tot  <- empty_vec  # Simulated Snow Water Equivalent (SWE)
   
-  #CALCULATE PET (HAMON EQUATION) ----------------------------------------------
+  #CALCULATE PET (HAMON EQUATION) ---------------------------------------------#
   pet <- petHamon2(coeff = coeff, basin_lat = as.numeric(Basin_Lat), Tavg=Tavg, ...)    
 
-  #PERFORM HYDROLOGY SIMULATION USING THE SAC-SMA ------------------------------   
-  thres_zero  <- 0.00001      # Threshold to be considered as zero
+  #PERFORM HYDROLOGY SIMULATION USING THE SAC-SMA -----------------------------#   
+  thres_zero  <- 0.00001 # Threshold to be considered as zero
   parea       <- 1 - adimp - pctim
 
   for (i in 1:length(pet)) {
     
-    # SNOW COMPONENT (IGNORE FOR NOW!!!!!!!!) ***********************
     # Precipitation adjusted by snow process (SNOW17)
     if(flag_snowmodule == 1) {
       
       SNOW17_out <- SNOW17(pars = snowpar, prcp = Prcp[i], temp = Tavg[i], 
-        elev = Basin_Elev, states_input = snow_state, TIME = sim_date_mat[i,])
-        
+         elev = Basin_Elev, states_input = snow_state, TIME = sim_doy_mat[i,])
+      
       SWE <- SNOW17_out$SWE
       meltNrain  <- SNOW17_out$meltNrain
       snow_state <- SNOW17_out$states_input_update
@@ -179,9 +182,7 @@ sac_sma <- function(Prcp, Tavg, Basin_Lat, Basin_Elev, Par,
       et3   <- et3 + lztwc  # et3 = lztwc  
       lztwc <- 0
     }
-    #????? not updated red is used later for ET(5) calculation
-    
-    
+
     # Water resupply from Lower free water storages to Lower tension water storage
     saved  <- rserv * (lzfpm + lzfsm)
     ratlzt <- lztwc / lztwm

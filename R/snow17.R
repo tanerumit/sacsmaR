@@ -1,13 +1,13 @@
 
 #SNOW MODULE 
-snow17 <- function(pars, prcp, temp, elev, states_input, TIME) {
+SNOW17 <- function(pars, prcp, temp, elev, states_input, TIME) {
 
   #State parameters  
   W_i     <- states_input[1]; ATI <- states_input[2] 
   W_q     <- states_input[3]; Deficit <- states_input[4] 
 
   #Other parameters
-  SCF    <- pars[1]; PXTEMP <- pars[2]; MFMAX <- pars[3]; MFMIN <- pars[4] 
+  SCF    <- pars[1]; PXTEMP <- pars[2]; MFMAX <- pars[3]; MFMIN  <- pars[4] 
   UADJ   <- pars[5]; MBASE  <- pars[6]; TIPM  <- pars[7]; PLWHC  <- pars[8] 
   NMF    <- pars[9]; DAYGM  <- pars[10] 
   
@@ -20,12 +20,10 @@ snow17 <- function(pars, prcp, temp, elev, states_input, TIME) {
   # FORM OF PRECIPITATION
   if (Ta <= PXTEMP) {
     # Air temperature is cold enough for snow to occur
-    SNOW <- Pr  
-    RAIN <- 0 
+    SNOW <- Pr; RAIN <- 0; 
   } else {
     # Air temperature is warm enough for rain
-    SNOW <- 0   
-    RAIN <- Pr 
+    SNOW <- 0; RAIN <- Pr; 
   }              
   
   # ACCUMULATION OF THE SNOW COVER
@@ -33,15 +31,14 @@ snow17 <- function(pars, prcp, temp, elev, states_input, TIME) {
   W_i <- W_i + Pn    # Water equivalent of the ice portion of the snow cover [mm]
   E   <- 0           # Excess liquid water in the snow cover
   
-  
   # ENERGY EXCHANGE AT SNOW/AIR SURFACE DURING NON-MELT PERIODS
   
   # Seasonal variation in the non-rain melt factor 
-  DAYN <- TIME[2]  
-  end_doy <- yday(as.Date(paste0(year(test),"/12/31"))) - 365
+  DAYN <- TIME$jday 
+  end_doy <-  TIME$end_doy - 365 
+  days <- end_doy + 365
   N_Mar21 <- DAYN - (80 + end_doy)
 
-  
   Sv <- (0.5*sin((N_Mar21 * 2 * pi)/days)) + 0.5        # Seasonal variation
   Av <- 1.0                                             # Seasonal variation adjustment, Av<-1.0 when lat < 54N
   Mf <- dtt/6 * ((Sv * Av * (MFMAX - MFMIN)) + MFMIN)   # Seasonally varying non-rain melt factor
@@ -58,7 +55,7 @@ snow17 <- function(pars, prcp, temp, elev, states_input, TIME) {
   delta_HD_T <- NMF * dtp/6 * Mf/MFMAX * (ATI - T_snow_new)   
   
   # Update ATI[Antecedent Temperature Index]
-  if(Pn > (1.5*dtp)) {
+  if(Pn > 1.5*dtp) {
     ATI <- T_snow_new       #Antecedent temperature index  
   } else {
     TIPM_dtt <- 1.0 - ((1.0 - TIPM)^(dtt/6)) 
@@ -69,7 +66,7 @@ snow17 <- function(pars, prcp, temp, elev, states_input, TIME) {
 
   # SNOW MELT
   T_rain  <- max(Ta,0)    # Temperature of rain (deg C), Ta or 0C, whichever greater
-  if(RAIN > (0.25 * dtp)) {
+  if(RAIN > 0.25 * dtp) {
     # Rain-on-Snow Melt
     stefan <- 6.12*(10^(-10))                                               # Stefan-Boltzman constant (mm/K/hr)
     e_sat  <- 2.7489*(10^8)*exp((-4278.63/(Ta+242.792)))                    # Saturated vapor pressure at Ta (mb)
@@ -80,12 +77,14 @@ snow17 <- function(pars, prcp, temp, elev, states_input, TIME) {
     Melt   <- term1 + term2 + term3 
     Melt   <- max(Melt,0)  
     
-  } else if (RAIN <= (0.25 * dtp) && (Ta > MBASE)) {
+  } else if ((RAIN <= 0.25 * dtp) && (Ta > MBASE)) {
     # Non-Rain Melt
     Melt <- (Mf * (Ta - MBASE) * (dtp/dtt)) + (0.0125 * RAIN * T_rain) 
     Melt <- max(Melt,0) 
   
-    } else {Melt <- 0}
+  } else {
+      Melt <- 0
+  }
   
   # Ripeness of the snow cover
   # W_i : water equivalent of the ice portion of the snow cover
@@ -103,30 +102,33 @@ snow17 <- function(pars, prcp, temp, elev, states_input, TIME) {
     W_i  <- W_i-Melt  
     Qw   <- Melt + RAIN 
     W_qx <- PLWHC * W_i 
-  }
   
-  if((Qw + W_q) > (Deficit + Deficit*PLWHC + W_qx)) { # THEN the snow is RIPE
+    if((Qw + W_q) > (Deficit + Deficit*PLWHC + W_qx)) { # THEN the snow is RIPE
+      
+      E   <- Qw + W_q - W_qx - Deficit - (Deficit * PLWHC)       # Excess liquid water [mm]
+      W_i <- W_i + Deficit                             # W_i increases because water refreezes as heat deficit is decreased
+      W_q <- W_qx + PLWHC * Deficit                    # fills liquid water capacity
+      Deficit <- 0 
     
-    E   <- Qw + W_q - W_qx - Deficit - (Deficit * PLWHC)       # Excess liquid water [mm]
-    W_i <- W_i + Deficit                             # W_i increases because water refreezes as heat deficit is decreased
-    W_q <- W_qx + PLWHC * Deficit                    # fills liquid water capacity
-    Deficit <- 0 
-  } else if((Qw + W_q) >= Deficit) { #& [[Qw + W_q] <= [[Deficit*[1+PLWHC]] + W_qx]]            
-    # THEN the snow is NOT yet ripe, but ice is being melted
+    } else if((Qw + W_q) >= Deficit) {
     
-    E <- 0 
-    W_i <- W_i + Deficit                # W_i increases because water refreezes as heat deficit is decreased
-    W_q <- W_q + Qw - Deficit 
-    Deficit <- 0 
+      #& [[Qw + W_q] <= [[Deficit*[1+PLWHC]] + W_qx]]            
+      # THEN the snow is NOT yet ripe, but ice is being melted
+    
+      E <- 0 
+      W_i <- W_i + Deficit                # W_i increases because water refreezes as heat deficit is decreased
+      W_q <- W_q + Qw - Deficit 
+      Deficit <- 0 
 
-  } else if((Qw + W_q) < Deficit) {      #elseif [[Qw + W_q] < Deficit]    
-    # THEN the snow is NOT yet ripe
-    E <- 0 
-    W_i <- W_i + Qw + W_q                    # W_i increases because water refreezes as heat deficit is decreased
-    Deficit <- Deficit - Qw - W_q 
-  }    
+    } else if((Qw + W_q) < Deficit) {      #elseif [[Qw + W_q] < Deficit]    
+    
+      # THEN the snow is NOT yet ripe
+      E <- 0 
+      W_i <- W_i + Qw + W_q                    # W_i increases because water refreezes as heat deficit is decreased
+      Deficit <- Deficit - Qw - W_q 
+    }    
 
-  else  {
+  } else  {
     
     Melt <- W_i+W_q # Melt >= W_i
     W_i <- 0 
@@ -134,6 +136,7 @@ snow17 <- function(pars, prcp, temp, elev, states_input, TIME) {
     Qw <- Melt + RAIN 
     E  <- Qw 
     #         SWE = 0
+    
   }              
 
   if(Deficit == 0) {ATI = 0}
@@ -164,5 +167,5 @@ snow17 <- function(pars, prcp, temp, elev, states_input, TIME) {
   meltNrain <- E 
   states_input_update <- c(W_i ,ATI ,W_q ,Deficit)
   
-  return(list(SWE, meltNrain, states_input_update))
+  return(list(SWE = SWE, meltNrain = meltNrain, states_input_update = states_input_update))
 }

@@ -37,11 +37,8 @@
 #flag_snowmodule = 0 
 
 
-#griddata_list <- lapply(1:num_hru, function(x) read.table(hru_names[x])) %>%
-#  bind_rows(.id = "hru") %>% as_data_frame() %>%
-#  write_csv(., path = "gridclim.csv")
-sac_sma_dsm <- compiler::cmpfun(function(str_date, end_date, grid_lat, grid_lon, grid_area, grid_elev, 
-                        grid_flowlen, grid_par, flag_SNOW17 = 0) {
+sac_sma_dsm <- function(str_date, end_date, grid_lat, grid_lon, grid_area, 
+                        grid_elev, grid_par, flag_SNOW17 = 0) {
   
   #Essential R-packages needed
   require(tidyr)
@@ -80,12 +77,12 @@ sac_sma_dsm <- compiler::cmpfun(function(str_date, end_date, grid_lat, grid_lon,
   num_hru  <- nrow(grid_info)  # Total number of HRUs
   tot_area <- sum(grid_area)   # Total watershed area
   
-  #Run through each HRU, simulate streamflow 
-  FLOW <- vector(mode = "numeric", length = sim_per) 
+  #Simulate streamflow at each hru +++++++++++++++++++++++++++++++++++++++++++++
+  hru_simflow <- list()
   for (n in 1:num_hru) {
   
     # Read-in data for current HRU
-    hru_data  <- grid_data[[n]]
+    hru_data  <- hru_clim[[n]]
 
     # Find starting and ending indices based on the specified dates
     if (n == 1) {
@@ -99,25 +96,51 @@ sac_sma_dsm <- compiler::cmpfun(function(str_date, end_date, grid_lat, grid_lon,
     hru_prcp    <- hru_data[grid_ind,4]
     hru_temp    <- hru_data[grid_ind,5] 
 
-    hru_simflow <- sac_sma(Prcp = hru_prcp, Tavg = hru_temp, 
+    hru_simflow[[n]] <- sac_sma(Prcp = hru_prcp, Tavg = hru_temp, 
       Basin_Lat = grid_lat[n], Basin_Elev = grid_elev[n], 
-      Par = as.numeric(grid_par[n,]), IniState = inistates, doy = sim_doy)
+      Par = as.numeric(grid_par[n,]), IniState = inistates, doy = sim_doy,
+      flag_snowmodule = flag_SNOW17)
     
-    hru_simflow <- hru_simflow * grid_area[n] / tot_area
-
-    # # CHANNEL ROUTING FROM LOHMANN MODEL  
-    pars_rout <- as.numeric(grid_par[n,28:31])     
-    UH_river  <- route_lohamann(pars = pars_rout, flowlen = grid_flowlen[n], UH_DAY, KE)
-
-
-    # CONVOLUTION (Vectorized form)  
-    for(i in 1:sim_per) {
-      j <- 1:(KE+UH_DAY-1); j <- j[i-j+1 >= 1]
-      FLOW[i] <- FLOW[i] + sum(UH_river[j] * hru_simflow[i-j+1])
-    }
-
+    hru_simflow[[n]] <- hru_simflow[[n]] * grid_area[n] / tot_area
+    
   } #close the loop for each hru
   
-  return(FLOW)
+  #Rout simulated streamflow at each outlet location +++++++++++++++++++++++++++
+  outlet_loc <- unique(grid_info_multigage$outlet_id)
+  outlet_num <- length(outlet_loc)
+  FLOW_ALL <- rep(list(vector(mode = "numeric", length = sim_per)), outlet_num)
   
-})
+  #Repeat for all outlet locations
+  for (k in 1:outlet_num) {
+  
+    FLOW <- vector(mode = "numeric", length = sim_per)
+    
+    grid_info_cur <- grid_info_multigage %>% filter(outlet_id == k)
+    num_hru_cur   <- grid_info_cur %>% pull(HRU_id) 
+    grid_par_cur  <- grid_par[num_hru_cur,]
+    grid_flowlen_cur <- grid_info_cur$`HRU_FlowLen(m)`
+    
+    for (n in 1:length(num_hru_cur)) {
+      
+      # CHANNEL ROUTING FROM LOHMANN MODEL 
+      pars_rout <- as.numeric(grid_par_cur[n,28:31])     
+      UH_river  <- route_lohamann(pars = pars_rout, flowlen = grid_flowlen_cur[n], UH_DAY, KE)
+      
+      # CONVOLUTION (Vectorized form)  
+      for(i in 1:sim_per) {
+        j <- 1:(KE+UH_DAY-1) 
+        j <- j[i-j+1 >= 1]
+        FLOW[i] <- FLOW[i] + sum(UH_river[j] * hru_simflow[[n]][i-j+1])
+      }
+    }  
+
+    FLOW_ALL[[k]] <- FLOW  
+    
+  } #close loop for outlet locations
+  
+  return(FLOW_ALL)
+}
+
+
+
+

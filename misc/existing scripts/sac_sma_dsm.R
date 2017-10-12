@@ -89,9 +89,9 @@ sac_sma_dsm <- function(str_date, end_date, grid_lat, grid_lon, grid_area,
       grid_date <- as.Date(paste(hru_data[[1]], hru_data[[2]], hru_data[[3]], sep ="/"))
       grid_ind  <- which(str_date == grid_date):which(end_date == grid_date) 
     }
-    
+  
     hru_data <- as.matrix(hru_data)
-    
+  
     # FLOW SIMULATION USING SAC-SMA MODEL  
     hru_prcp    <- hru_data[grid_ind,4]
     hru_temp    <- hru_data[grid_ind,5] 

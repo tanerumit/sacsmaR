@@ -1,7 +1,4 @@
 
-
-# MODEL SETTINGS ---------------------------------------------------------------
-
 source("./R/sac_sma.R")
 source("./R/sac_sma_dsm.R")
 source("./R/PET functions.R")
@@ -29,7 +26,6 @@ for (n in 1:num_hru) {
 calib_par <- read.table(
   paste0(main_filedir,'/HRUfiles/hru_optpar_0425_arrhon_KGE75.txt'))
 
-# SIMULATION ANALYSIS ----------------------------------------------------------
 
 str_date = as.Date("1995/10/1")
 end_date = as.Date("2014/09/30")

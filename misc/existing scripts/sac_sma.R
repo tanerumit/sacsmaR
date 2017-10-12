@@ -1,7 +1,5 @@
 
 
-
-
 # SAC SMA - hydrology simulation model
 
 ### Inputs
@@ -472,3 +470,8 @@ sac_sma <- function(Prcp, Tavg, Basin_Lat, Basin_Elev, Par,
   return(simflow)
 
 }
+
+
+# -----------------------------------------------------------------------------#
+
+

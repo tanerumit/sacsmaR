@@ -1,0 +1,21 @@
+Package: hydrosystems
+Type: Package
+Title: Tools for hydrologic and water systems modeling & analysis
+Version: 0.0.1
+Depends: R (>= 3.4.0)
+Author: M. Umit Taner
+Maintainer: M. Umit Taner <tanerumit@gmail.com>
+Description: Tools for hydrologic and water systems modeling & analysis
+License: GPL-2
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 5.0.1
+Imports:  
+    lazyeval,
+    prim,
+    akima,
+    dplyr, 
+    ggplot2
+Suggests: 
+    tidyr, 
+    lubridate

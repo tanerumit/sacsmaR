@@ -33,8 +33,19 @@ petHamon2 <- function(doy, coeff, basin_lat, Tavg) {
   return(pet)
 }
   
+
+################################################################################
+
+petHamon3 <- function(dayOfyear, coeff, lat, temp) {
   
-  
+  var_theta   <- 0.2163108 + 2*atan(0.9671396 * tan(0.0086 * (dayOfyear-186))) 
+  var_pi      <- asin(0.39795 * cos(var_theta)) 
+  daylighthr  = 24-24/pi * acos((sin(0.8333*pi/180) + sin(lat*pi/180) * sin(var_pi))/(cos(lat*pi/180)*cos(var_pi))) 
+  esat <- 0.611 * exp(17.27 * temp/(237.3 + temp))
+
+  return(coeff * 29.8 * daylighthr*(esat/(temp + 273.2)))
+}
+
 
 
 

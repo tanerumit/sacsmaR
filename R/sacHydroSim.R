@@ -1,27 +1,25 @@
-#' @title FUNCTION_TITLE
-#' @description FUNCTION_DESCRIPTION
-#' @param par PARAM_DESCRIPTION
-#' @param tavg PARAM_DESCRIPTION
-#' @param prcp PARAM_DESCRIPTION
-#' @param lat PARAM_DESCRIPTION
-#' @param elev PARAM_DESCRIPTION
-#' @param dayOfyear PARAM_DESCRIPTION
-#' @param lastDayOfYear PARAM_DESCRIPTION
+#' @title Distributed Hydrology-Routing Model
+#' @description See details
+#' @param par_petHamon PARAM_DESCRIPTION
+#' @param par_snow17 PARAM_DESCRIPTION
+#' @param par_sacsma PARAM_DESCRIPTION
+#' @param par_routLah PARAM_DESCRIPTION
+#' @param hru_tavg PARAM_DESCRIPTION
+#' @param hru_prcp PARAM_DESCRIPTION
+#' @param hru_lat PARAM_DESCRIPTION
+#' @param hru_elev PARAM_DESCRIPTION
+#' @param hru_area PARAM_DESCRIPTION
+#' @param hru_flowLength PARAM_DESCRIPTION
+#' @param hru_subcat PARAM_DESCRIPTION
+#' @param jday PARAM_DESCRIPTION
 #' @return OUTPUT_DESCRIPTION
 #' @details DETAILS
-#' @examples 
-#' \dontrun{
-#' if(interactive()){
-#'  #EXAMPLE1
-#'  }
-#' }
 #' @rdname sacHydroSim
 #' @export 
 sacHydroSim <- function(par_petHamon, par_snow17, par_sacsma, par_routLah,
                         hru_tavg, hru_prcp, hru_lat, hru_elev, hru_area, 
-                        hru_flowLength, hru_subcat = NULL, dayOfYear, 
-                        lastDayOfYear) {
-  
+                        hru_flowLength, hru_subcat = NULL, jday) {
+
   # Base Time of Unit Hydrographs of HRU and River in Routing model. 
   KE      <-  12  # Base time for HRU UH (day)
   UH_DAY  <-  96  # Base time for river routing UH (day)
@@ -31,14 +29,12 @@ sacHydroSim <- function(par_petHamon, par_snow17, par_sacsma, par_routLah,
 
   ### CALCULATE PET FOR ALL HRUs
   hru_pet <- lapply(1:hru_num, function(x) 
-    petHamon(coeff = par_petHamon[x], tavg = hru_tavg[[x]], lat = hru_lat[[x]], 
-             dayOfYear = dayOfYear))
+    petHamon(coeff = par_petHamon[x], tavg = hru_tavg[[x]], lat = hru_lat[[x]], jday))
   
   ### CALCULATE SNOW MODULE FOR ALL HRUs
   hru_meltNrain <- lapply(1:hru_num, function(x) 
     snow17(par = par_snow17[x,], prcp = hru_prcp[[x]], tavg = hru_tavg[[x]], 
-           elev = hru_elev[[x]], dayOfYear = dayOfYear, 
-           lastDayOfYear =  lastDayOfYear)) 
+           elev = hru_elev[[x]], jday = jday)) 
   
   ### CALCULATE STREAMFLOW GENERATION AT ALL HRUs
   hru_simflow <- lapply(1:hru_num, function(x) 
@@ -48,14 +44,14 @@ sacHydroSim <- function(par_petHamon, par_snow17, par_sacsma, par_routLah,
                         hru_simflow[[x]] * area[x] / sum(area))
   ### CHANNEL ROUTING
   UH_river <- lapply(1:hru_num, function(x) 
-    routeLohamann(par = par_routLah[x,], flowLength = hru_flowLength[x]))
+    routeLohmann(par = par_routLah[x,], flowLength = hru_flowLength[x]))
   
   ### CONVOLUTION
   j_i <- 1:(KE+UH_DAY-1) 
   j <- lapply(1:sim_num, function(i) j_i[i-j_i+1 >= 1])
   
   #convolution for a single outlet 
-  if (is.null(hru_subat)) {
+  if (is.null(hru_subcat)) {
 
     #Vector to store the final flow computed
     FLOW <- vector("numeric", length = sim_num)
@@ -98,4 +94,3 @@ sacHydroSim <- function(par_petHamon, par_snow17, par_sacsma, par_routLah,
 }  
   
   
-# Current progress: work on the multi-outlet channel routing part

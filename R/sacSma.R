@@ -1,13 +1,13 @@
 #' @title Sacremento Soil Moisture Accounting Model SAC-SMA
 #' @description FUNCTION_DESCRIPTION
-#' @param par model parameters
+#' @param par a numeric vector of model parameters (see details)
 #' @param statesIni initial parameters
 #' @param prcp daily precipitation data
 #' @param pet potential evapotranspiration, in mm
 #' @param lat latitude information, in Deg
 #' @param elev elevation, in meters
-#' @param verbose PARAM_DESCRIPTION, Default: FALSE
-#' @return OUTPUT_DESCRIPTION
+#' @param verbose additional model outputs (Default: FALSE)
+#' @return a numeric vector, defining surface flow (in mm)
 #' @details DETAILS
 #' @examples 
 #' \dontrun{

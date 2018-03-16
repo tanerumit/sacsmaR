@@ -1,1 +1,11 @@
-placeholder
+Package: SACSMAR
+Type: Package
+Title: SAC-SMA HYDROLOGY MODEL
+Version: 0.0.1
+Author: M. Umit Taner
+Maintainer: M. Umit Taner <tanerumit@gmail.com>
+Description: Placeholder
+License: What license is it under?
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 6.0.1

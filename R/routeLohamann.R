@@ -1,20 +1,29 @@
-#' @title FUNCTION_TITLE
-#' @description FUNCTION_DESCRIPTION
-#' @param par PARAM_DESCRIPTION
-#' @param flowLength PARAM_DESCRIPTION
-#' @param UH_DAY PARAM_DESCRIPTION, Default: 96
-#' @param KE PARAM_DESCRIPTION, Default: 12
-#' @return OUTPUT_DESCRIPTION
-#' @details DETAILS
-#' @examples 
-#' \dontrun{
-#' if(interactive()){
-#'  #EXAMPLE1
-#'  }
-#' }
-#' @rdname routeLohamann
+#' @title River channel Routing model
+#' @description Mimics the routing model first described by Lohmann et al. (1998), which has been used within the 
+#'   Variable Infiltration Capacity model (VIC) 
+#' @param par Vector of length four, describing the following model parameters (see details)
+#' @param flowLength Flow length to the basin outlet (in meters) 
+#' @param UH_DAY Base time for river routing Unit Hydrograph (day) (Default: 96)
+#' @param KE # Base time for HRU unit hydrograph (day) (Default: 12)
+#' @return Placeholder
+#' @rdname routeLohmann
+#' @details Each grid cell is represented by a node in the channel network.
+#' The total runoff and baseflow from each grid cell is first convolved with a unit hydrograph 
+#' representing the distribution of travel times of water from its points of origin to the channel network
+#' Then, each grid cell's input into the channel network is routed through the channel 
+#' using linearized St. Venant's equations
+#' 
+#' The four parameters of the model are as follows:
+#' NumRes: Grid Unit Hydrograph parameter defining the number of linear reservoirs
+#' K: Grid Unit Hydrograph parameter defining the reservoir storage constant
+#' VELO: wave velocity in the linearized Saint-Venant equation (cubic meters per sec)
+#' DIFF: diffusivity in the linearized Saint-Venant equation (sq.meters per sec)
+#' 
+#' The detailed description of the routing can be found at:
+#' Lohmann, D. E. Raschke, B. Nijssen and D.P. Lettenmaier, 1998: Regional scale hydrology: II. Application of the VIC-2L model to the Weser river, Germany, Hydrol. Sci. J., 43(1), 143-158.
+#' 
 #' @export 
-routeLohamann <- function(par, flowLength, UH_DAY = 96, KE = 12) {
+routeLohmann <- function(par, flowLength, UH_DAY = 96, KE = 12) {
   
   hruh_fun <- function(x) dgamma(x, shape = NumRes, scale = 1/K)
   

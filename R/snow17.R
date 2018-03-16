@@ -1,25 +1,18 @@
-#' @title FUNCTION_TITLE
-#' @description FUNCTION_DESCRIPTION
-#' @param par PARAM_DESCRIPTION
-#' @param prcp PARAM_DESCRIPTION
-#' @param tavg PARAM_DESCRIPTION
-#' @param elev PARAM_DESCRIPTION
-#' @param statesIni PARAM_DESCRIPTION
-#' @param dayOfYear PARAM_DESCRIPTION
-#' @param lastDayOfYear PARAM_DESCRIPTION
-#' @param verbose PARAM_DESCRIPTION, Default: FALSE
-#' @return OUTPUT_DESCRIPTION
+#' @title SNOW17 Model
+#' @description Snow model
+#' @param par snow module parameters
+#' @param prcp numeric vector of precipitation time-series (mm)
+#' @param tavg numeric vector of average temperatuer time-series (Deg C)
+#' @param elev elevation (meters)
+#' @param statesIni initial state parameters
+#' @param jday julian day of the year
+#' @param verbose additional model outputs (default: FALSE)
+#' @return a numeric vector of precipitation series
 #' @details DETAILS
-#' @examples 
-#' \dontrun{
-#' if(interactive()){
-#'  #EXAMPLE1
-#'  }
-#' }
 #' @rdname snow17
 #' @export 
 snow17 <- function(par, statesIni = c(0,0,0,0), prcp, tavg, elev, 
-                   dayOfYear, lastDayOfYear, verbose = FALSE) {
+    jday, verbose = FALSE) {
   
   #SET PARAMETERS
   SCF    <- par[1]; PXTEMP <- par[2]; MFMAX <- par[3]; MFMIN  <- par[4] 
@@ -63,11 +56,10 @@ snow17 <- function(par, statesIni = c(0,0,0,0), prcp, tavg, elev,
     # ENERGY EXCHANGE AT SNOW/AIR SURFACE DURING NON-MELT PERIODS
     
     # Seasonal variation in the non-rain melt factor 
-    DAYN <- dayOfYear[i]
-    days <- lastDayOfYear[i]
-    N_Mar21 <- DAYN - (80 + days - 365)
+    # (Assume a year has 365 days)
+    N_Mar21 <- jday[i] - 80  
     
-    Sv <- (0.5*sin((N_Mar21 * 2 * pi)/days)) + 0.5        # Seasonal variation
+    Sv <- (0.5*sin((N_Mar21 * 2 * pi)/365)) + 0.5         # Seasonal variation
     Av <- 1.0                                             # Seasonal variation adjustment, Av<-1.0 when lat < 54N
     Mf <- dtt/6 * ((Sv * Av * (MFMAX - MFMIN)) + MFMIN)   # Seasonally varying non-rain melt factor
     

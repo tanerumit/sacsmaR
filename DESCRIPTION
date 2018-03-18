@@ -4,7 +4,7 @@ Title: SAC-SMA HYDROLOGY MODEL
 Version: 0.0.1
 Author: M. Umit Taner
 Maintainer: M. Umit Taner <tanerumit@gmail.com>
-Description: Placeholder
+Description: R implementation of the SAC SMA hydrology model
 License: What license is it under?
 Encoding: UTF-8
 LazyData: true

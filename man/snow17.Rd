@@ -4,13 +4,13 @@
 \alias{snow17}
 \title{SNOW17 Model}
 \usage{
-snow17(par, statesIni = c(0, 0, 0, 0), prcp, tavg, elev, jday,
+snow17(par, states.ini = c(0, 0, 0, 0), prcp, tavg, elev, jday,
   verbose = FALSE)
 }
 \arguments{
 \item{par}{snow module parameters}
 
-\item{statesIni}{initial state parameters}
+\item{states.ini}{initial state parameters}
 
 \item{prcp}{numeric vector of precipitation time-series (mm)}
 

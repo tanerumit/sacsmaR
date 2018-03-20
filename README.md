@@ -28,7 +28,6 @@ Further information is available at: [NOAA - National Weather Service](http://ww
 <p align="center">
 <img src="http://www.appsolutelydigital.com/ModelPrimer/images/image79.jpeg">
 </p>
-![alt text](http://www.appsolutelydigital.com/ModelPrimer/images/image79.jpeg "SAC-SMA model")
 
 ------------------------------------------------------------------------
 

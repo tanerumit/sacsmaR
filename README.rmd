@@ -52,8 +52,6 @@ Further information is available at:
 </p>
 
 
-![alt text](http://www.appsolutelydigital.com/ModelPrimer/images/image79.jpeg "SAC-SMA model")
-
 ------
 
 ### Included functions

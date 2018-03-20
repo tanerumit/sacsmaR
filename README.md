@@ -25,7 +25,10 @@ The SAC-SMA is a continuous soil moisture accounting model with spatially lumped
 
 Further information is available at: [NOAA - National Weather Service](http://www.nws.noaa.gov/oh/hrl/nwsrfs/users_manual/part2/_pdf/23sacsma.pdf)
 
+<center>
 ![alt text](http://www.appsolutelydigital.com/ModelPrimer/images/image79.jpeg "SAC-SMA model")
+
+</center>
 
 ------------------------------------------------------------------------
 

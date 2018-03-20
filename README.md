@@ -15,7 +15,7 @@ devtools::install_github("tanerumit/sacsmaR")
 
 ### R Version
 
-The original model code is written in Fortran and is publicly accessible. The R version is translated from the MATLAB code developed by [Sungwook Wi](https://github.com/sungwookwi)
+The original model code is written in Fortran and is publicly accessible. The R version is translated from the MATLAB code developed by [Sungwook Wi](https://github.com/sungwookwi).
 
 ------------------------------------------------------------------------
 
@@ -33,33 +33,22 @@ Further information is available at: [NOAA - National Weather Service](http://ww
 
 The package consists of five functions:
 
-#### Potential Evaporation module based on Hamon equation:
-
 ``` r
+# hamon estimates daily potential evapotranspiration
 hamon(par, tavg, lat, jday)
-```
 
-#### Sacsma module for run-off generation
-
-``` r
+#sacsma returns daily run-off series 
 sacsma(par, states.ini = c(0, 0, 5, 5, 5, 0), prcp, pet, lat, elev, verbose = FALSE)
-```
 
-#### Lohmann channel routing
-
-``` r
+# Lohmann channel routing module
 lohmann(par, flength, uh.day = 96, ke = 12)
-```
 
-#### Snow17 module for snowmelt calculation
 
-``` r
+# Snow17 module for snowmelt calculation
 snow17(par, states.ini = c(0, 0, 0, 0), prcp, tavg, elev, jday, verbose = FALSE)
-```
 
-#### HydroSim: wrapper for Sac-sma, Lahmann, and Hamon modules
 
-``` r
+# HydroSim wrapper for Hamon, sacsma, Lahmann, and Hamon modules
 hydroSim(par.hamon, par.snow17, par.sacsma, par.lohmann, tavg.grid, prcp.grid, lat.grid, 
-  elev.grid, area.grid, flength.grid, subcat.grid = NULL, jday)
+         elev.grid, area.grid, flength.grid, subcat.grid = NULL, jday)
 ```

@@ -2,7 +2,7 @@
 Sacramento Soil Moisture Accounting (SAC-SMA) Model
 ===================================================
 
-***Disclaimer: Currently under development***
+***Disclaimer: currently under development***
 
 ### Installation
 
@@ -15,7 +15,7 @@ devtools::install_github("tanerumit/sacsmaR")
 
 ### R Version
 
-The original model code is written in Fortran and is publicly accessible. The R version of the model is translated from MATLAB code developed by [Sungwook Wi](https://github.com/sungwookwi)
+The original model code is written in Fortran and is publicly accessible. The R version is translated from the MATLAB code developed by [Sungwook Wi](https://github.com/sungwookwi)
 
 ------------------------------------------------------------------------
 
@@ -31,7 +31,7 @@ Further information is available at: [NOAA - National Weather Service](http://ww
 
 ### Included functions
 
-The package contains for main function, which are described below:
+The package consists of five functions:
 
 #### Potential Evaporation module based on Hamon equation:
 

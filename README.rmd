@@ -22,8 +22,9 @@ devtools::install_github("tanerumit/sacsmaR")
 
 ### R Version
 
-The original model code is written in Fortran and is publicly accessible. The R
-version is translated from the MATLAB code developed by [Sungwook Wi](https://github.com/sungwookwi)
+The original model code is written in Fortran and is publicly accessible. 
+The R version is translated from the MATLAB code developed by 
+[Sungwook Wi](https://github.com/sungwookwi).
 
 
 ------
@@ -31,15 +32,16 @@ version is translated from the MATLAB code developed by [Sungwook Wi](https://gi
 ### Description
 
 The SAC-SMA is a continuous soil moisture accounting model with spatially 
-lumped parameters that simulates runoff within a basin. The model divides the 
-basin into lower and upper zones at different depths, and defines the distribution 
-of moisture, i.e., tension water components (driven by evapotranspiration and 
-diffusion) and free water components (driven by gravitational forces) in each of 
-these two zones via a set of parameters. The model uses precipitation and temperature 
-variables, along with parameters on soil moisture states and the basin’s relative 
-permeability to estimate the amount of water that enters, is stored in, and leaves 
-the basin. Thus, the model estimates several key hydrologic processes including 
-evapotranspiration, percolation, interflow, and different forms of runoff from a basin. 
+lumped parameters that simulates runoff within a basin. The model divides 
+the basin into lower and upper zones at different depths, and defines the 
+distribution of moisture, i.e., tension water components (driven by 
+evapotranspiration and diffusion) and free water components (driven by 
+gravitational forces) in each of these two zones via a set of parameters. 
+The model uses precipitation and temperature variables, along with parameters 
+on soil moisture states and the basin’s relative permeability to estimate the 
+amount of water that enters, is stored in, and leaves the basin. Thus, the 
+model estimates several key hydrologic processes including  evapotranspiration, 
+percolation, interflow, and different forms of runoff from a basin. 
 
 Further information is available at: 
 [NOAA - National Weather Service](http://www.nws.noaa.gov/oh/hrl/nwsrfs/users_manual/part2/_pdf/23sacsma.pdf)
@@ -52,36 +54,24 @@ Further information is available at:
 
 The package consists of five functions:
 
-
-#### Potential Evaporation module based on Hamon equation:
-
 ```{r eval=FALSE}
+
+# hamon estimates daily potential evapotranspiration
 hamon(par, tavg, lat, jday)
-```
 
-
-#### Sacsma module for run-off generation
-
-```{r eval=FALSE}
+#sacsma returns daily run-off series 
 sacsma(par, states.ini = c(0, 0, 5, 5, 5, 0), prcp, pet, lat, elev, verbose = FALSE)
-```
 
-#### Lohmann channel routing
-
-```{r eval=FALSE}
+# Lohmann channel routing module
 lohmann(par, flength, uh.day = 96, ke = 12)
-```
 
-#### Snow17 module for snowmelt calculation
 
-```{r eval=FALSE}
+# Snow17 module for snowmelt calculation
 snow17(par, states.ini = c(0, 0, 0, 0), prcp, tavg, elev, jday, verbose = FALSE)
-```
 
-#### HydroSim: wrapper for Sac-sma, Lahmann, and Hamon modules
 
-```{r eval=FALSE}
+# HydroSim wrapper for Hamon, sacsma, Lahmann, and Hamon modules
 hydroSim(par.hamon, par.snow17, par.sacsma, par.lohmann, tavg.grid, prcp.grid, lat.grid, 
-  elev.grid, area.grid, flength.grid, subcat.grid = NULL, jday)
-```
+         elev.grid, area.grid, flength.grid, subcat.grid = NULL, jday)
 
+```

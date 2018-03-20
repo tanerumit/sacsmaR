@@ -7,7 +7,7 @@ output:
 
 # Sacramento Soil Moisture Accounting (SAC-SMA) Model
 
-**_The model is currently under development_**
+**_Disclaimer: Currently under development_**
 
 ### Installation
 
@@ -30,7 +30,6 @@ version of the model is translated from MATLAB code developed by [Sungwook Wi](h
 
 ### Description
 
-```
 The SAC-SMA is a continuous soil moisture accounting model with spatially 
 lumped parameters that simulates runoff within a basin. The model divides the 
 basin into lower and upper zones at different depths, and defines the distribution 
@@ -42,8 +41,8 @@ permeability to estimate the amount of water that enters, is stored in, and leav
 the basin. Thus, the model estimates several key hydrologic processes including 
 evapotranspiration, percolation, interflow, and different forms of runoff from a basin. 
 
-Further information is available at: [NOAA - National Weather Service](http://www.nws.noaa.gov/oh/hrl/nwsrfs/users_manual/part2/_pdf/23sacsma.pdf)
-```
+Further information is available at: 
+[NOAA - National Weather Service](http://www.nws.noaa.gov/oh/hrl/nwsrfs/users_manual/part2/_pdf/23sacsma.pdf)
 
 ![alt text](http://www.appsolutelydigital.com/ModelPrimer/images/image79.jpeg "SAC-SMA model")
 

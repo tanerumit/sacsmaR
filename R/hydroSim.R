@@ -1,14 +1,14 @@
 #' @title Distributed Hydrology-Routing Model
 #' @description To be completed...
-#' @param par.hamon parameters passed to hamon module 
-#' @param par.snow17 parameters passed to snow17 module
-#' @param par.sacsma parameters passed to sacsma module
+#' @param par.hamon   parameters passed to hamon module 
+#' @param par.snow17  parameters passed to snow17 module
+#' @param par.sacsma  parameters passed to sacsma module
 #' @param par.lohmann parameters to be passed to lohmann module
-#' @param tavg.grid a list of temperature series for each grid point
-#' @param prcp.grid a list of precipitation series for each grid point
-#' @param lat.grid a list of latitudes for each grid point
-#' @param elev.grid a list of elevation information for each grid point
-#' @param area.grid a list of area information for each grid point
+#' @param tavg.grid   a list of temperature series for each grid point
+#' @param prcp.grid   a list of precipitation series for each grid point
+#' @param lat.grid    a list of latitudes for each grid point
+#' @param elev.grid   a list of elevation information for each grid point
+#' @param area.grid   a list of area information for each grid point
 #' @param flength.grid a list of flowlength information for each grid point
 #' @param subcat.grid a list of subcatchment outlet points
 #' @param jday a time-series of julian day of the year (1-3655)

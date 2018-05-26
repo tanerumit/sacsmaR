@@ -1,3 +1,4 @@
+
 #' @title Hamon Potential Evapotranspiration Equation
 #' @description The Hamon method is also considered as one of the simplest estimates 
 #'     of potential Evapotranspiration. 

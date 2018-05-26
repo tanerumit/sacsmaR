@@ -24,17 +24,17 @@ sacsma <- function(par, states.ini = c(0, 0, 5, 5, 5, 0), prcp, pet, lat, elev, 
   lztwm <- par[3]  # Lower zone tension water capacity [mm]
   lzfpm <- par[4]  # Lower zone primary free water capacity [mm]
   lzfsm <- par[5]  # Lower zone supplementary free water capacity [mm]
-  uzk <- par[6]  # Upper zone free water lateral depletion rate [1/day]
-  lzpk <- par[7]  # Lower zone primary free water depletion rate [1/day]
-  lzsk <- par[8]  # Lower zone supplementary free water depletion rate [1/day]
+  uzk <- par[6]    # Upper zone free water lateral depletion rate [1/day]
+  lzpk <- par[7]   # Lower zone primary free water depletion rate [1/day]
+  lzsk <- par[8]   # Lower zone supplementary free water depletion rate [1/day]
   zperc <- par[9]  # Percolation demand scale parameter [-]
   rexp <- par[10]  # Percolation demand shape parameter [-]
-  pfree <- par[11]  # Percolating water split parameter (decimal fraction)
-  pctim <- par[12]  # Impervious fraction of the watershed area (decimal fraction)
-  adimp <- par[13]  # Additional impervious areas (decimal fraction)
+  pfree <- par[11] # Percolating water split parameter (decimal fraction)
+  pctim <- par[12] # Impervious fraction of the watershed area (decimal fraction)
+  adimp <- par[13] # Additional impervious areas (decimal fraction)
   riva <- par[14]  # Riparian vegetation area (decimal fraction)
   side <- par[15]  # The ratio of deep recharge to channel base flow [-]
-  rserv <- par[16]  # Fraction of lower zone free water not transferrable (decimal fraction)
+  rserv <- par[16] # Fraction of lower zone free water not transferrable (decimal fraction)
   
   # Initial Storage States (SAC-SMA)
   uztwc <- states.ini[1]  # Upper zone tension water storage
@@ -56,10 +56,10 @@ sacsma <- function(par, states.ini = c(0, 0, 5, 5, 5, 0), prcp, pet, lat, elev, 
     lzfsc_tot <- simflow  # State of Lower zone free water supplementary storage [mm]
     lzfpc_tot <- simflow  # State of Lower zone free water primary storage [mm]
     adimc_tot <- simflow  # State of additional impervious area storages [mm]
-    tet_tot <- simflow  # Simulated Actual Evapotranspiration
-    base_tot <- simflow  # Simulated Base Flow
-    surf_tot <- simflow  # Simulated Surface&Subsurface water flow
-    SWE_tot <- simflow  # Simulated Snow Water Equivalent (SWE)
+    tet_tot   <- simflow  # Simulated Actual Evapotranspiration
+    base_tot  <- simflow  # Simulated Base Flow
+    surf_tot  <- simflow  # Simulated Surface&Subsurface water flow
+    SWE_tot   <- simflow  # Simulated Snow Water Equivalent (SWE)
     
   }
   
@@ -69,10 +69,10 @@ sacsma <- function(par, states.ini = c(0, 0, 5, 5, 5, 0), prcp, pet, lat, elev, 
   for (i in 1:length(prcp)) {
     
     ### Set input precipitation and potential evapotranspiration
-    pr = prcp[i]
+    pr    = prcp[i]
     edmnd = pet[i]
     
-    ## Compute for different compnents...  ET(1), ET from Upper zone tension water storage
+    ## Compute for different components...  ET(1), ET from Upper zone tension water storage
     et1 <- edmnd * uztwc/uztwm
     red <- edmnd - et1  # residual ET demand
     uztwc <- uztwc - et1
@@ -82,6 +82,7 @@ sacsma <- function(par, states.ini = c(0, 0, 5, 5, 5, 0), prcp, pet, lat, elev, 
     
     # in case et1 > uztws, no water in the upper tension water storage
     if (uztwc <= 0) {
+      
       et1 <- et1 + uztwc  #et1 = uztwc
       uztwc <- 0
       red <- edmnd - et1
@@ -187,11 +188,11 @@ sacsma <- function(par, states.ini = c(0, 0, 5, 5, 5, 0), prcp, pet, lat, elev, 
     roimp <- pr * pctim
     
     # Initialize time interval sums
-    sbf <- 0  # Sum of total baseflow(from primary and supplemental storages)
-    ssur <- 0  # Sum of surface runoff
-    sif <- 0  # Sum of interflow
+    sbf   <- 0  # Sum of total baseflow(from primary and supplemental storages)
+    ssur  <- 0  # Sum of surface runoff
+    sif   <- 0  # Sum of interflow
     sperc <- 0  # Time interval summation of percolation
-    sdro <- 0  # Sum of direct runoff from the additional impervious area
+    sdro  <- 0  # Sum of direct runoff from the additional impervious area
     
     # Determine computational time increments for the basic time interval
     ninc <- floor(1 + 0.2 * (uzfwc + twx))  # Number of time increments that interval is divided into for further soil-moisture accountng
@@ -199,7 +200,7 @@ sacsma <- function(par, states.ini = c(0, 0, 5, 5, 5, 0), prcp, pet, lat, elev, 
     pinc <- twx/ninc  # Amount of available moisture for each increment
     
     # Compute free water depletion fractions for the time increment (basic depletions are for one day)
-    duz <- 1 - (1 - uzk)^dinc
+    duz  <- 1 - (1 - uzk)^dinc
     dlzp <- 1 - (1 - lzpk)^dinc
     dlzs <- 1 - (1 - lzsk)^dinc
     
@@ -249,18 +250,14 @@ sacsma <- function(par, states.ini = c(0, 0, 5, 5, 5, 0), prcp, pet, lat, elev, 
         # DEFR is the lower zone moisture deficiency ratio
         defr <- 1 - (lztwc + lzfpc + lzfsc)/(lztwm + lzfpm + lzfsm)
         
-        if (defr < 0) {
-          defr <- 0
-        }
+        if (defr < 0) {defr <- 0}
         
         perc <- perc * (1 + zperc * (defr^rexp))
         
         # Note. . . percolation occurs from uzfws before pav is added
         
         # Percolation rate exceeds uzfws
-        if (perc >= uzfwc) {
-          perc <- uzfwc
-        }
+        if (perc >= uzfwc) {perc <- uzfwc}
         
         uzfwc <- uzfwc - perc  # Percolation rate is less than uzfws.
         
@@ -275,8 +272,8 @@ sacsma <- function(par, states.ini = c(0, 0, 5, 5, 5, 0), prcp, pet, lat, elev, 
         sperc <- sperc + perc
         
         # Compute interflow and keep track of time interval sum. Note that PINC has not yet been added.
-        del <- uzfwc * duz  # The amount of interflow
-        sif <- sif + del
+        del   <- uzfwc * duz  # The amount of interflow
+        sif   <- sif + del
         uzfwc <- uzfwc - del
         
         # Distribute percolated water into the lower zones. Tension water must be filled first except for
@@ -284,6 +281,7 @@ sacsma <- function(par, states.ini = c(0, 0, 5, 5, 5, 0), prcp, pet, lat, elev, 
         # water.
         
         perct <- perc * (1 - pfree)  # Percolation going to the tension water storage
+        
         if ((perct + lztwc) <= lztwm) {
           
           lztwc <- lztwc + perct
@@ -310,9 +308,7 @@ sacsma <- function(par, states.ini = c(0, 0, 5, 5, 5, 0), prcp, pet, lat, elev, 
           # The fraction going to primary
           fracp <- hpl * 2 * (1 - ratlp)/(2 - ratlp - ratls)
           
-          if (fracp > 1) {
-          fracp <- 1
-          }
+          if (fracp > 1) {fracp <- 1}
           
           percp <- percf * fracp  # Amount of the excess percolation going to primary
           percs <- percf - percp  # Amount of the excess percolation going to supplemental
@@ -340,19 +336,18 @@ sacsma <- function(par, states.ini = c(0, 0, 5, 5, 5, 0), prcp, pet, lat, elev, 
           
           # check if pinc exceeds uzfwm
           if ((pinc + uzfwc) <= uzfwm) {
-          
-          uzfwc <- uzfwc + pinc  # no surface runoff
+            uzfwc <- uzfwc + pinc  # no surface runoff
           } else {
-          sur <- pinc + uzfwc - uzfwm  # Surface runoff
-          uzfwc <- uzfwm
+            sur <- pinc + uzfwc - uzfwm  # Surface runoff
+            uzfwc <- uzfwm
           
-          ssur = ssur + (sur * parea)
+            ssur = ssur + (sur * parea)
           
-          # ADSUR is the amount of surface runoff which comes from that portion of adimp which is not
-          # currently generating direct runoff. ADDRO/PINC is the fraction of adimp currently generating
-          # direct runoff.
-          adsur = sur * (1 - addro/pinc)
-          ssur = ssur + adsur * adimp
+            # ADSUR is the amount of surface runoff which comes from that portion of adimp which is not
+            # currently generating direct runoff. ADDRO/PINC is the fraction of adimp currently generating
+            # direct runoff.
+            adsur = sur * (1 - addro/pinc)
+            ssur = ssur + adsur * adimp
           
           }
         }
@@ -367,9 +362,7 @@ sacsma <- function(par, states.ini = c(0, 0, 5, 5, 5, 0), prcp, pet, lat, elev, 
       # Direct runoff from the additional impervious area
       sdro = sdro + (addro * adimp)
       
-      if (adimc < thres_zero) {
-        adimc <- 0
-      }
+      if (adimc < thres_zero) {adimc <- 0}
       
     }  # END of incremental for loop
     
@@ -395,17 +388,16 @@ sacsma <- function(par, states.ini = c(0, 0, 5, 5, 5, 0), prcp, pet, lat, elev, 
     tet <- eused + et4 + et5
     
     # Check that adims >= uztws
-    if (adimc < uztwc) 
-      adimc <- uztwc
+    if (adimc < uztwc) adimc <- uztwc
     
     # Total inflow to channel for a timestep
     simflow[i] <- surf + base - et4
     
     # Optional outputs
     if (verbose == TRUE) {
-      tet_tot[i] <- tet
-      surf_tot[i] <- surf
-      base_tot[i] <- base
+      tet_tot[i]   <- tet
+      surf_tot[i]  <- surf
+      base_tot[i]  <- base
       uztwc_tot[i] <- uztwc
       uzfwc_tot[i] <- uzfwc
       lztwc_tot[i] <- lztwc
@@ -417,5 +409,10 @@ sacsma <- function(par, states.ini = c(0, 0, 5, 5, 5, 0), prcp, pet, lat, elev, 
   
   simflow <- ifelse(simflow < 0, 0, simflow)
   
-  return(simflow)
+  if(verbose == FALSE) {
+    output = simflow
+  } else {
+    output <- list(simflow = simflow, baseflow = base_tot, surfaceflow = surf_tot)
+  }
+  return(output)
 }

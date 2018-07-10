@@ -17,23 +17,24 @@
 #' }
 #' @rdname sacSim
 #' @export 
-sacsma <- function(par, states.ini = c(0, 0, 5, 5, 5, 0), prcp, pet, lat, elev, verbose = FALSE) {
+sacsma <- function(par, states.ini = c(0, 0, 5, 5, 5, 0), prcp, pet, lat, elev, 
+                   verbose = FALSE) {
   
   uztwm <- par[1]  # Upper zone tension water capacity [mm]
   uzfwm <- par[2]  # Upper zone free water capacity [mm]
   lztwm <- par[3]  # Lower zone tension water capacity [mm]
   lzfpm <- par[4]  # Lower zone primary free water capacity [mm]
   lzfsm <- par[5]  # Lower zone supplementary free water capacity [mm]
-  uzk <- par[6]    # Upper zone free water lateral depletion rate [1/day]
-  lzpk <- par[7]   # Lower zone primary free water depletion rate [1/day]
-  lzsk <- par[8]   # Lower zone supplementary free water depletion rate [1/day]
+  uzk   <- par[6]  # Upper zone free water lateral depletion rate [1/day]
+  lzpk  <- par[7]  # Lower zone primary free water depletion rate [1/day]
+  lzsk  <- par[8]  # Lower zone supplementary free water depletion rate [1/day]
   zperc <- par[9]  # Percolation demand scale parameter [-]
-  rexp <- par[10]  # Percolation demand shape parameter [-]
+  rexp  <- par[10] # Percolation demand shape parameter [-]
   pfree <- par[11] # Percolating water split parameter (decimal fraction)
   pctim <- par[12] # Impervious fraction of the watershed area (decimal fraction)
   adimp <- par[13] # Additional impervious areas (decimal fraction)
-  riva <- par[14]  # Riparian vegetation area (decimal fraction)
-  side <- par[15]  # The ratio of deep recharge to channel base flow [-]
+  riva  <- par[14] # Riparian vegetation area (decimal fraction)
+  side  <- par[15] # The ratio of deep recharge to channel base flow [-]
   rserv <- par[16] # Fraction of lower zone free water not transferrable (decimal fraction)
   
   # Initial Storage States (SAC-SMA)
@@ -56,10 +57,11 @@ sacsma <- function(par, states.ini = c(0, 0, 5, 5, 5, 0), prcp, pet, lat, elev, 
     lzfsc_tot <- simflow  # State of Lower zone free water supplementary storage [mm]
     lzfpc_tot <- simflow  # State of Lower zone free water primary storage [mm]
     adimc_tot <- simflow  # State of additional impervious area storages [mm]
+    
     tet_tot   <- simflow  # Simulated Actual Evapotranspiration
-    base_tot  <- simflow  # Simulated Base Flow
-    surf_tot  <- simflow  # Simulated Surface&Subsurface water flow
-    SWE_tot   <- simflow  # Simulated Snow Water Equivalent (SWE)
+    base_tot  <- simflow  # Simulated base Flow
+    surf_tot  <- simflow  # Simulated surface & subsurface water flow
+    SWE_tot   <- simflow  # Simulated snow Water Equivalent (SWE)
     
   }
   
@@ -410,6 +412,7 @@ sacsma <- function(par, states.ini = c(0, 0, 5, 5, 5, 0), prcp, pet, lat, elev, 
   simflow <- ifelse(simflow < 0, 0, simflow)
   
   if(verbose == FALSE) {
+    
     output = simflow
   } else {
     output <- list(simflow = simflow, baseflow = base_tot, surfaceflow = surf_tot)

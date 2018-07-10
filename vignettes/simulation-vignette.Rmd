@@ -41,8 +41,9 @@ library(ggplot2)
 # We'll use the St. Croix Watershed data, which is included in this package  
 data(stcroix)
 
-# Grid info file, consists of latitude, longitude, area, elevation, and 
-# flowlegth information. Each row belongs to a different HRU
+# Grid info file, consists of essential information for each grid cell:
+# latitude (Deg), longitude (Deg), area, elevation (meters),  
+# flowlegth  Each row belongs to a different HRU
 
 grid_info <- stcroix$hru.info
 hru_lat     <- unlist(grid_info[,1], use.names = FALSE)
@@ -129,6 +130,9 @@ simflow <- sacsma(par = par_sacsma[1,],
 flow <- lohmann(par = par_routLah[1,], flength = hru_flowlen[1])
 
 ```
+
+
+
 
 # Hydrology simulation 
 

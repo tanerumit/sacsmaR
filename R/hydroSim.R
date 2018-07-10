@@ -1,6 +1,6 @@
 #' @title Distributed Hydrology-Routing Model
 #' @description To be completed...
-#' @param par.hamon   parameters passed to hamon module 
+#' @param par.hamon   parameters passed to pet hamon module 
 #' @param par.snow17  parameters passed to snow17 module
 #' @param par.sacsma  parameters passed to sacsma module
 #' @param par.lohmann parameters to be passed to lohmann module
@@ -16,6 +16,7 @@
 #' @details to be completed...
 #' @rdname hydroSim
 #' @export 
+
 hydroSim <- function(par.hamon, par.snow17, par.sacsma, par.lohmann, tavg.grid, prcp.grid, lat.grid, 
   elev.grid, area.grid, flength.grid, subcat.grid = NULL, jday) {
   

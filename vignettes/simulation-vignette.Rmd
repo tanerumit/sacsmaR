@@ -155,5 +155,3 @@ flowR <- hydroSim(
 df <- data_frame(date = seq_date, flowR = flowR)
 ggplot(df, aes(date, flowR)) + geom_line() + labs(x = "", y = "flow (mm/day)")
 ```
-
-

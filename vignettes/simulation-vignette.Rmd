@@ -36,108 +36,102 @@ library(ggplot2)
 
 # Input-data
 
-```{r data, cache = TRUE}
+We'll use the St. Croix Watershed data, which is included in this package 
+`r data(stcroix)`
 
-# We'll use the St. Croix Watershed data, which is included in this package  
-data(stcroix)
+## Simulation period & Grid-info file
+```{r prep1, cache = TRUE}
+
+watershed <- "stcroix" 
+
+# starting date of the simulation
+str_date <- as.Date("1970/01/1") 
+
+# ending date of the simulation
+end_date <- as.Date("1980/12/31")  
 
 # Grid info file, consists of essential information for each grid cell:
 # latitude (Deg), longitude (Deg), area, elevation (meters),  
 # flowlegth  Each row belongs to a different HRU
 
-grid_info <- stcroix$hru.info
-hru_lat     <- unlist(grid_info[,1], use.names = FALSE)
-hru_lon     <- unlist(grid_info[,2], use.names = FALSE)
-hru_area    <- unlist(grid_info[,3], use.names = FALSE)
-hru_elev    <- unlist(grid_info[,4], use.names = FALSE)
-hru_flowlen <- unlist(grid_info[,5], use.names = FALSE)
-
-# Calibration parameters for the hydrology, pet, snow, and routing modules.
-# Each row belongs to a different HRU
-
-hru_par   <- stcroix$hru.par
-par_sacsma   <- hru_par[,1:16]    # Sac-sma parameters
-par_petHamon <- hru_par[,17]      # PET (Hamon) parameters
-par_snow17   <- hru_par[,18:27]   # Snow module parameters
-par_routLah  <- hru_par[,28:31]   # Routing model parameters
-
-# Climate input data: time-series of precipitation and temperature for each HRU.
-
-hru_prcp  <- stcroix$prcp.grid
-hru_tavg  <- stcroix$tavg.grid
-
-# Finally, lets set the simulation period 
-str_date <- as.Date("1970/01/1") #starting date
-end_date <- as.Date("1980/12/31") # endind date
-seq_date <- seq.Date(str_date, end_date, by = "day") #date sequence
-sim_date <- seq.Date(str_date, end_date, by = "day") #date sequence
-sim_per  <- length(sim_date) #number of days in the simulation period
-jday <- lubridate::yday(sim_date) # day of the year in (1-365 format)
-
+hru_info <- stcroix$hru.info    
+as_tibble(grid_info)
 ```
 
+## Model parameters
+
+Calibration parameters for the hydrology, pet, snow, and routing modules.
+Each row belongs to a different HRU
+
+```{r prep2, cache = TRUE}
+hru_par  <- stcroix$hru.par
+as_tibble(hru_par)
+```  
+
+## Climate inputs
+
+```{r prep3, cache = TRUE}
+#time-series of precipitation and temperature for each HRU.
+hru_prcp  <- stcroix$prcp.grid
+hru_tavg  <- stcroix$tavg.grid
+```
 
 # Illustration of modules
 
 ## PET module
 
+Simulate daily potential evapotranspiration for a single HRU based on Hamon equation.
+The pet equation takes four inputs: par (pet parameter), tavg (time-series of average 
+temperature), latitude information, and jday (day of the year from 1 to 365)
+
 ```{r pet, cache = TRUE}
 
-# Simulate daily potential evapotranspiration for a single HRU based on Hamon equation.
-# The pet equation takes four inputs: par (pet parameter), tavg (time-series of average 
-# temperature), latitude information, and jday (day of the year from 1 to 365)
-
-pet <- hamon(par = par_petHamon[1], 
+pet <- hamon(par  = par_petHamon[1], 
              tavg = hru_tavg[[1]],
-             lat = hru_lat[[1]], 
+             lat  = hru_lat[[1]], 
              jday = jday)
 
 df <- data_frame(date = seq_date, pet = pet)
 ggplot(df, aes(date, pet)) + geom_line() + labs(x = "", y = "PET (mm/day)")
-
 ```
 
 ## SNOW module
 
+Simulates snow based on the SNOW17 model
+
 ```{r snow17, cache = TRUE}
-
-# The snow module is based on SNOW17 model
-
 snowMelt <- snow17(par = par_snow17[1,],
                    prcp = hru_prcp[[1]],
                    tavg = hru_tavg[[1]],
                    elev = hru_elev[[1]],
                    jday = jday)
-
 ```
 
 ## Runoff module
 
+Simulates runoff at each grid cell
+
 ```{r sacsma, cache = TRUE}
-### SAC MODULE
 simflow <- sacsma(par = par_sacsma[1,],
                   prcp = hru_prcp[[1]],
                   pet = pet, lat = hru_lat[1], elev = hru_elev[1])
-
 ```
 
 ## Routing module
 
+Simulates routing along the river using the lohmann model
+
 ```{r lohmann, cache = TRUE}
-
-# Routing module is based on lohmann model 
-
 flow <- lohmann(par = par_routLah[1,], flength = hru_flowlen[1])
-
 ```
-
-
 
 
 # Hydrology simulation 
 
-```{r hydrosim, cache = TRUE}
+Complete hydrological simulation using the Hydrosim() function, which is a wrapper 
+for the PET, SAC-SMA, SNOW17, and Lohmann modules
 
+```{r hydrosim, cache = TRUE}
 hru_par <- hru_par %>% as.matrix()
 
 par_sacsma   = hru_par[,1:16] 
@@ -158,4 +152,8 @@ flowR <- hydroSim(
   flength.grid = hru_flowlen,
   jday = jday)
 
+df <- data_frame(date = seq_date, flowR = flowR)
+ggplot(df, aes(date, flowR)) + geom_line() + labs(x = "", y = "flow (mm/day)")
 ```
+
+

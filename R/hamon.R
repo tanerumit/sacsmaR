@@ -5,7 +5,7 @@
 #' @param par proportionality coefficient (unitless)
 #' @param tavg  vector of mean daily temperature (deg C) 
 #' @param lat latitude ()
-#' @param jday a day number of the year (julian day of the year)
+#' @param jdate a day number of the year (julian day of the year)
 #' @return outputs potential evapotranspiration (mm day-1)
 #' @details For details see Haith and Shoemaker (1987) 
 #' @examples 
@@ -16,9 +16,9 @@
 #' }
 #' @rdname hamon
 #' @export 
-hamon <- function(par, tavg, lat, jday) {
+hamon <- function(par, tavg, lat, jdate) {
   
-  var_theta <- 0.2163108 + 2 * atan(0.9671396 * tan(0.0086 * (jday - 186)))
+  var_theta <- 0.2163108 + 2 * atan(0.9671396 * tan(0.0086 * (jdate - 186)))
   var_pi <- asin(0.39795 * cos(var_theta))
   daylighthr <- 24 - 24/pi * acos((sin(0.8333 * pi/180) + sin(lat * pi/180) * sin(var_pi))/(cos(lat * 
     pi/180) * cos(var_pi)))

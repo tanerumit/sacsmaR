@@ -4,47 +4,46 @@
 #' @param prcp numeric vector of precipitation time-series (mm)
 #' @param tavg numeric vector of average temperatuer time-series (Deg C)
 #' @param elev elevation (meters)
-#' @param states.ini initial state parameters
-#' @param jday julian day of the year
+#' @param ini.states initial state parameters
+#' @param jdate julian day of the year
 #' @param verbose additional model outputs (default: FALSE)
 #' @return a numeric vector of precipitation series
 #' @details DETAILS
 #' @rdname snow17
 #' @export 
-snow17 <- function(par, states.ini = c(0, 0, 0, 0), prcp, tavg, elev, jday, verbose = FALSE) {
+snow17 <- function(par, prcp, tavg, elev, jdate, ini.states = c(0, 0, 0, 0)) {
   
   # SET PARAMETERS
-  SCF <- par[1]
+  SCF    <- par[1]
   PXTEMP <- par[2]
-  MFMAX <- par[3]
-  MFMIN <- par[4]
-  UADJ <- par[5]
-  MBASE <- par[6]
-  TIPM <- par[7]
-  PLWHC <- par[8]
-  NMF <- par[9]
-  DAYGM <- par[10]
+  MFMAX  <- par[3]
+  MFMIN  <- par[4]
+  UADJ   <- par[5]
+  MBASE  <- par[6]
+  TIPM   <- par[7]
+  PLWHC  <- par[8]
+  NMF    <- par[9]
+  DAYGM  <- par[10]
   
   # Define constants
   dtt <- 24  # time interval of temperature data
   dtp <- 24  # time interval of prcipitation data
   
   meltNrain <- vector(mode = "numeric", length = length(prcp))
-  SWE_vec <- vector(mode = "numeric", length = length(prcp))
-  
+
   # LOOP THROUGH EACH PERIOD
   for (i in 1:length(prcp)) {
-    
+
+    # Set initial states
+    W_i <- ini.states[1]
+    ATI <- ini.states[2]
+    W_q <- ini.states[3]
+    Deficit <- ini.states[4]
+  
     # Set current temperature and precipitation
     Ta <- tavg[i]  # Air temperature at this time step [deg C]
     Pr <- prcp[i]  # Precipitation at this time step [mm]
-    
-    # State parameters
-    W_i <- states.ini[1]
-    ATI <- states.ini[2]
-    W_q <- states.ini[3]
-    Deficit <- states.ini[4]
-    
+
     # FORM OF PRECIPITATION
     if (Ta <= PXTEMP) {
       # Air temperature is cold enough for snow to occur
@@ -64,7 +63,7 @@ snow17 <- function(par, states.ini = c(0, 0, 0, 0), prcp, tavg, elev, jday, verb
     # ENERGY EXCHANGE AT SNOW/AIR SURFACE DURING NON-MELT PERIODS
     
     # Seasonal variation in the non-rain melt factor (Assume a year has 365 days)
-    N_Mar21 <- jday[i] - 80
+    N_Mar21 <- jdate[i] - 80
     
     Sv <- (0.5 * sin((N_Mar21 * 2 * pi)/365)) + 0.5  # Seasonal variation
     Av <- 1  # Seasonal variation adjustment, Av<-1.0 when lat < 54N
@@ -195,14 +194,9 @@ snow17 <- function(par, states.ini = c(0, 0, 0, 0), prcp, tavg, elev, jday, verb
     }
     
     meltNrain[i] <- E
-    SWE_vec[i] <- SWE
-    states.ini <- c(W_i, ATI, W_q, Deficit)
-    
+    ini.states <- c(W_i, ATI, W_q, Deficit)
+  
   }
   
-  if (verbose == FALSE) {
-    return(meltNrain)
-  } else {
-    return(list(SWE = SWE_vec, meltNrain = meltNrain))
-  }
+  return(meltNrain)
 }

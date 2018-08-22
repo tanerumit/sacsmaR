@@ -1,21 +1,15 @@
 
-#' @title Hamon Potential Evapotranspiration Equation
-#' @description The Hamon method is also considered as one of the simplest estimates 
-#'     of potential Evapotranspiration. 
-#' @param par proportionality coefficient (unitless)
-#' @param tavg  vector of mean daily temperature (deg C) 
-#' @param lat latitude ()
-#' @param jdate a day number of the year (julian day of the year)
-#' @return outputs potential evapotranspiration (mm day-1)
-#' @details For details see Haith and Shoemaker (1987) 
-#' @examples 
-#' \dontrun{
-#' if(interactive()){
-#'  #EXAMPLE1deg
-#'  }
-#' }
-#' @rdname hamon
-#' @export 
+#' Title
+#'
+#' @param par 
+#' @param tavg 
+#' @param lat 
+#' @param jdate 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 hamon <- function(par, tavg, lat, jdate) {
   
   var_theta <- 0.2163108 + 2 * atan(0.9671396 * tan(0.0086 * (jdate - 186)))

@@ -1,21 +1,15 @@
 
-#' @title Sacremento Soil Moisture Accounting Model SAC-SMA
-#' @description FUNCTION_DESCRIPTION
-#' @param par model parameters
-#' @param ini.states initial parameters
-#' @param prcp daily precipitation data
-#' @param pet potential evapotranspiration, in mm
-#' @param verbose PARAM_DESCRIPTION, Default: FALSE
-#' @return OUTPUT_DESCRIPTION
-#' @details DETAILS
-#' @examples 
-#' \dontrun{
-#' if(interactive()){
-#'  #EXAMPLE1
-#'  }
-#' }
-#' @rdname sacSim
-#' @export 
+#' Title
+#'
+#' @param par 
+#' @param ini.states 
+#' @param prcp 
+#' @param pet 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 sacSma <- function(par, ini.states = c(0,0,500,500,500,0), prcp, pet) {
   
   uztwm  <-  par[1]    # Upper zone tension water capacity [mm]

@@ -1,14 +1,19 @@
-
-str.date = str_date
-end.date = end_date
-hru.par =  hru_par
-hru.info = hru_info
-hru.elevband = hru_elevband
-clim.dir = clim_dir
-snow.flag  = 0
-
-
-HydroSimDist <- function(str.date = NULL, end.date = NULL, 
+#' Title
+#'
+#' @param str.date 
+#' @param end.date 
+#' @param hru.par 
+#' @param hru.info 
+#' @param hru.elevband 
+#' @param clim.dir 
+#' @param snow.flag 
+#' @param progress.bar 
+#'
+#' @return
+#' @export
+#'
+#' @examples
+distHydroSim <- function(str.date = NULL, end.date = NULL, 
   hru.par = NULL, hru.info = NULL, hru.elevband = NULL, clim.dir, snow.flag = 0,
   progress.bar = TRUE) {
   

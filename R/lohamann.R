@@ -1,20 +1,14 @@
-
-#' @title FUNCTION_TITLE
-#' @description FUNCTION_DESCRIPTION
-#' @par  par PARAM_DESCRIPTION
-#' @param flowlen PARAM_DESCRIPTION
-#' @param UH_DAY PARAM_DESCRIPTION, Default: 96
-#' @param KE PARAM_DESCRIPTION, Default: 12
-#' @return OUTPUT_DESCRIPTION
-#' @details DETAILS
-#' @examples 
-#' \dontrun{
-#' if(interactive()){
-#'  #EXAMPLE1
-#'  }
-#' }
-#' @rdname routeLohamann
-#' @export 
+#' Title
+#'
+#' @param par 
+#' @param inflow.direct 
+#' @param inflow.base 
+#' @param flowlen 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 lohamann <- function(par, inflow.direct, inflow.base, flowlen) {
   
   #browser()

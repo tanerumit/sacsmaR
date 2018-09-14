@@ -1,18 +1,5 @@
-#' Title
-#'
-#' @param str.date 
-#' @param end.date 
-#' @param hru.par 
-#' @param hru.info 
-#' @param hru.elevband 
-#' @param clim.dir 
-#' @param snow.flag 
-#' @param progress.bar 
-#'
-#' @return
-#' @export
-#'
-#' @examples
+
+
 distHydroSim <- function(str.date = NULL, end.date = NULL, 
   hru.par = NULL, hru.info = NULL, hru.elevband = NULL, clim.dir, snow.flag = 0,
   progress.bar = TRUE) {
@@ -21,12 +8,16 @@ distHydroSim <- function(str.date = NULL, end.date = NULL,
   sim_date <- seq.Date(str.date, end.date, by = "day") 
   jdate <- as.numeric(format(sim_date, "%j"))
   ydate <- as.POSIXlt(sim_date)$year + 1900
-  ddate <- as.POSIXlt(as.Date(paste0(ydate,"/12/31")))$yday
+  ddate <- as.POSIXlt(as.Date(paste0(ydate,"/12/31")))$yday + 1
 
+  # if there is only one dimension, make sure the input data is in matrix format
+  if(is.vector(hru.par))   hru.par <- t(as.matrix(hru.par))
+  if(is.vector(hru.info))  hru.info <- t(as.matrix(hru.info))
+  
   # Simulation parameters
   sim_num  <- length(sim_date)  # number of simulation steps (days)
   hru_num  <- nrow(hru.par)  # number of HRUs 
-  
+
   # climate data: YYYY - MM -DD -Precip (mm) - Temp (Deg C)
   # Output list ordered in the order of hru.info
   hru_clim0 <- list()
@@ -45,10 +36,10 @@ distHydroSim <- function(str.date = NULL, end.date = NULL,
   hru_tavg <- lapply(hru_clim, '[[', "tavg")
 
   # Optimal model calibration parameters
-  par_sacsma   <- hru.par[,1:16]   # Sac-sma model
-  par_petHamon <- hru.par[,17]     # Hamon equation (PET)
-  par_snow17   <- hru.par[,18:27]  # Snow17 model
-  par_routLah  <- hru.par[,28:31]  # Lohmann routing model
+  par_sacsma   <- hru.par[,1:16,  drop = FALSE]  # Sac-sma model
+  par_petHamon <- hru.par[,17,    drop = FALSE]  # Hamon equation (PET)
+  par_snow17   <- hru.par[,18:27, drop = FALSE]  # Snow17 model
+  par_routLah  <- hru.par[,28:31, drop = FALSE]  # Lohmann routing model
   
   # HRU parameters
   hru_num   <- nrow(hru.info)  # total number of hrus in the watershed
@@ -72,7 +63,6 @@ distHydroSim <- function(str.date = NULL, end.date = NULL,
 
   # Loop through each HRU and calculate adjust temp and pet values  
   if(progress.bar == TRUE) pb <- txtProgressBar(min=0, max=hru_num, style=3)
-  
   for (h in 1:hru_num) {
     
     # Vectors for surface and baseflow generated at each hru 
@@ -94,6 +84,7 @@ distHydroSim <- function(str.date = NULL, end.date = NULL,
  
       # Calculate hru flow for each elevation band  
       out <- sacSma(par = par_sacsma[h,], prcp = hru_mrain, pet = hru_pet)
+      
       flow_direct_tot <- out$surf 
       flow_base_tot   <- out$base 
 
@@ -108,7 +99,7 @@ distHydroSim <- function(str.date = NULL, end.date = NULL,
           hru_tavg_adj <- hru_tavg[[h]] - 6.1 * (hru_elev[[h]] - hru_elevband_elev_avg[h, nn]) / 1000
           
           # Adjusted PET
-          hru_pet <- hamon(par = par_petHamon[h], tavg = hru_tavg_adj, lat = hru_lat[h], jdate = jdate)
+          hru_pet_adj <- hamon(par = par_petHamon[h], tavg = hru_tavg_adj, lat = hru_lat[h], jdate = jdate)
           
           # If snow module is active, calculate snow
           if (snow.flag == 1) {
@@ -118,7 +109,7 @@ distHydroSim <- function(str.date = NULL, end.date = NULL,
           }
           
           # Calculate hru flow for each elevation band  
-          out <- sacSma(par = par_sacsma[h,], prcp = hru_mrain, pet = hru_pet)
+          out <- sacSma(par = par_sacsma[h,], prcp = hru_mrain, pet = hru_pet_adj)
           flow_direct_tot <- flow_direct_tot + out$surf * hru_elevband_frac[h,nn]
           flow_base_tot   <- flow_base_tot   + out$base * hru_elevband_frac[h,nn]
 
@@ -134,7 +125,6 @@ distHydroSim <- function(str.date = NULL, end.date = NULL,
 
     FLOW_SURF <- FLOW_SURF + out2$surf * hru_area[h] / tot_area
     FLOW_BASE <- FLOW_BASE + out2$base * hru_area[h] / tot_area
-    
     
     if(progress.bar == TRUE) setTxtProgressBar(pb, h)
   }

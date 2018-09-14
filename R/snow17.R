@@ -1,17 +1,16 @@
-
-#' Title
-#'
-#' @param par 
-#' @param prcp 
-#' @param tavg 
-#' @param elev 
-#' @param jdate 
-#' @param ini.states 
-#'
-#' @return
-#' @export
-#'
-#' @examples
+#' @title SNOW17 Model
+#' @description Snow model
+#' @param par snow module parameters
+#' @param prcp numeric vector of precipitation time-series (mm)
+#' @param tavg numeric vector of average temperatuer time-series (Deg C)
+#' @param elev elevation (meters)
+#' @param ini.states initial state parameters
+#' @param jdate julian day of the year
+#' @param verbose additional model outputs (default: FALSE)
+#' @return a numeric vector of precipitation series
+#' @details DETAILS
+#' @rdname snow17
+#' @export 
 snow17 <- function(par, prcp, tavg, elev, jdate, ini.states = c(0, 0, 0, 0)) {
   
   # SET PARAMETERS

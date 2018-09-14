@@ -4,13 +4,10 @@
 \alias{snow17}
 \title{SNOW17 Model}
 \usage{
-snow17(par, states.ini = c(0, 0, 0, 0), prcp, tavg, elev, jday,
-  verbose = FALSE)
+snow17(par, prcp, tavg, elev, jdate, ini.states = c(0, 0, 0, 0))
 }
 \arguments{
 \item{par}{snow module parameters}
-
-\item{states.ini}{initial state parameters}
 
 \item{prcp}{numeric vector of precipitation time-series (mm)}
 
@@ -18,7 +15,9 @@ snow17(par, states.ini = c(0, 0, 0, 0), prcp, tavg, elev, jday,
 
 \item{elev}{elevation (meters)}
 
-\item{jday}{julian day of the year}
+\item{jdate}{julian day of the year}
+
+\item{ini.states}{initial state parameters}
 
 \item{verbose}{additional model outputs (default: FALSE)}
 }

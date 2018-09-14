@@ -4,7 +4,7 @@
 \alias{hamon}
 \title{Hamon Potential Evapotranspiration Equation}
 \usage{
-hamon(par, tavg, lat, jday)
+hamon(par, tavg, lat, jdate)
 }
 \arguments{
 \item{par}{proportionality coefficient (unitless)}
@@ -13,7 +13,7 @@ hamon(par, tavg, lat, jday)
 
 \item{lat}{latitude ()}
 
-\item{jday}{a day number of the year (julian day of the year)}
+\item{jdate}{a day number of the year (julian day of the year)}
 }
 \value{
 outputs potential evapotranspiration (mm day-1)
